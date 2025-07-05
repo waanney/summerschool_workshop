@@ -1,19 +1,17 @@
 from typing import List 
-import os
 from dotenv import load_dotenv
-from pydantic_ai.models.gemini import GeminiModel
-from pydantic_ai.providers.google_gla import GoogleGLAProvider
+from google import genai
+
 
 load_dotenv()
-provider = GoogleGLAProvider(api_key=os.getenv("GEMINI_API_KEY"))
-model = GeminiModel('gemini-2.0-flash', provider=provider)
+client = genai.Client()
 
 class EmbeddingEngine:
     """
     A class that wraps the functionality for generating embeddings using OpenAI,
     with the ability to save and load its state.
     """
-    def __init__(self, model_name: str = "text-embedding-3-small", save_path: str = "embedding_state.json"):
+    def __init__(self, model_name: str = "embedding-001", save_path: str = "embedding_state.json"):
         """
         Initialize the EmbeddingEngine.
 
@@ -25,7 +23,6 @@ class EmbeddingEngine:
         self.corpus = []
         self.corpus_embeddings = None
         self.save_path = save_path
-
 
     def get_embeddings(self, texts: List[str]) -> List[List[float]]:
         """
@@ -69,7 +66,7 @@ class EmbeddingEngine:
             A list of floats representing the text's embedding, or None if an error occurs.
         """
         try:
-            response = client.embeddings.create(
+            response = client.models.embed_content(
                 model=self.model_name,
                 input=text
             )
@@ -77,7 +74,4 @@ class EmbeddingEngine:
         except Exception as e:
             print(f"Error generating embedding for text: '{text}'. Error: {e}")
             return []
-
-
-
 
