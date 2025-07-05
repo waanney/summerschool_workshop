@@ -9,13 +9,12 @@ from pymilvus import (
 from pymilvus import AnnSearchRequest, WeightedRanker
 from typing import List, Dict, Any, Optional
 import traceback
-
 import os
 
 
 class MilvusClient:
     def __init__(self):
-        self.collection_name = "vexere_database_loi_test"
+        self.collection_name = "summerschool_workshop"
         self._connect()
         self._ensure_collection_exists()
         self.collection = Collection(self.collection_name)
@@ -76,6 +75,87 @@ class MilvusClient:
                 description="FAQ collection schema",
             )
             Collection(name=self.collection_name, schema=schema)
+
+    def index_data(
+        self,
+        questions: List[str],
+        answers: List[str],
+        question_embeddings: List[List[float]],
+        answer_embeddings: List[List[float]],
+        sparse_question_embeddings: Optional[List[List[float]]] = None,
+        sparse_answer_embeddings: Optional[List[List[float]]] = None,
+    ):
+        """
+        Index questions, answers, and their embeddings (both dense and sparse) into the Milvus collection.
+
+        Args:
+            questions: List of question strings to be indexed.
+            answers: List of answer strings corresponding to the questions.
+            question_embeddings: List of dense embeddings for the questions.
+            answer_embeddings: List of dense embeddings for the answers.
+            sparse_question_embeddings: Optional list of sparse embeddings for questions.
+            sparse_answer_embeddings: Optional list of sparse embeddings for answers.
+        """
+        # Ensure connection before proceeding
+        self._ensure_connection()
+
+        try:
+            # Prepare the data to be inserted into Milvus
+            entities = [
+                {"name": "question", "values": questions, "type": DataType.VARCHAR},
+                {"name": "answer", "values": answers, "type": DataType.VARCHAR},
+                {"name": "question_dense_embedding", "values": question_embeddings, "type": DataType.FLOAT_VECTOR},
+                {"name": "answer_dense_embedding", "values": answer_embeddings, "type": DataType.FLOAT_VECTOR}
+            ]
+            
+            # Add sparse embeddings if provided
+            if sparse_question_embeddings:
+                entities.append(
+                    {"name": "question_sparse_embedding", "values": sparse_question_embeddings, "type": DataType.SPARSE_FLOAT_VECTOR}
+                )
+            if sparse_answer_embeddings:
+                entities.append(
+                    {"name": "answer_sparse_embedding", "values": sparse_answer_embeddings, "type": DataType.SPARSE_FLOAT_VECTOR}
+                )
+
+            # Insert data into Milvus collection
+            print(f"Inserting {len(questions)} records into Milvus...")
+            insert_result = self.collection.insert(entities)
+
+            # Check if the data was successfully inserted
+            if insert_result.insert_count == len(questions):
+                print(f"Successfully indexed {insert_result.insert_count} records.")
+            else:
+                print(f"Failed to insert all records. Only {insert_result.insert_count} were indexed.")
+            
+            # Optionally, create an index after inserting data
+            self.create_index()
+
+        except Exception as e:
+            print(f"Error indexing data: {e}")
+            traceback.print_exc()
+
+    def create_index(self):
+        """Create an index on the collection's vector fields for fast similarity search."""
+        try:
+            print("Creating index for question dense embedding...")
+            self.collection.create_index(
+                field_name="question_dense_embedding", 
+                index_params={"metric_type": "L2", "index_type": "IVF_FLAT", "params": {"nlist": 128}}
+            )
+
+            print("Creating index for answer dense embedding...")
+            self.collection.create_index(
+                field_name="answer_dense_embedding", 
+                index_params={"metric_type": "L2", "index_type": "IVF_FLAT", "params": {"nlist": 128}}
+            )
+            print("Index creation successful.")
+        except Exception as e:
+            print(f"Error creating index: {e}")
+            traceback.print_exc()
+
+   
+
 
     def hybrid_search(
         self,
@@ -206,4 +286,5 @@ class MilvusClient:
                 print(f"All search methods failed: {str(e3)}")
                 traceback.print_exc()
                 return []
-
+    
+    

@@ -26,11 +26,6 @@ class EmbeddingEngine:
         self.corpus_embeddings = None
         self.save_path = save_path
 
-    def add_corpus(self, corpus: List[str]):
-        """
-        Không cần thêm corpus vào bộ nhớ cục bộ nữa.
-        """
-        print("Adding new corpus data is no longer required. Milvus handles this.")
 
     def get_embeddings(self, texts: List[str]) -> List[List[float]]:
         """
@@ -83,14 +78,6 @@ class EmbeddingEngine:
             print(f"Error generating embedding for text: '{text}'. Error: {e}")
             return []
 
-    def save_state(self):
-        """
-        Không cần lưu trạng thái embeddings nữa.
-        """
-        print("Saving state is no longer required. Milvus handles this.")
 
-    def _load_state(self):
-        """
-        Không cần tải trạng thái embeddings nữa.
-        """
-        print("Loading state is no longer required. Milvus handles this.")
+
+
