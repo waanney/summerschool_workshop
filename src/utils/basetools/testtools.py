@@ -3,5 +3,6 @@ def get_current_date(ctx: RunContext) -> str:
 
     """Returns the current date."""
     from datetime import datetime
+    print("Using datetime tool")
     return datetime.now().strftime("%Y-%m-%d")
 
