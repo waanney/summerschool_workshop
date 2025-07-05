@@ -43,12 +43,6 @@ agent1 = agent_client.create_agent()
 
 
 
-
-
-
-
-
-
 @cl.on_message
 async def main(message: cl.Message):
     """Handle incoming messages and generate responses."""
