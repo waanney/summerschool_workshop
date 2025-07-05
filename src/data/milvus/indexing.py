@@ -12,13 +12,12 @@ import json
 import csv
 from data.milvus.milvus_client import MilvusClient
 import logging
-
 # Setup logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class MilvusIndexer:
-    def __init__(self, collection_name="summerschool_workshop", faq_file="admission_faq_large.csv"):
+    def __init__(self, collection_name="summerschool_workshop", faq_file="src/data/mock_data/admission_faq_large.csv"):
         self.collection_name = collection_name
         self.faq_file = faq_file
         self.milvus_client = MilvusClient()
