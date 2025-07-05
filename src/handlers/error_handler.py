@@ -1,4 +1,4 @@
-from ..utils.logger import setup_logger
+from utils.logger import setup_logger
 
 class ErrorHandler:
     def __init__(self, log_file="app.log"):

@@ -7,10 +7,10 @@ from pymilvus import (
     FunctionType,
     utility,
 )
-from ..embeddings.embedding_engine import EmbeddingEngine
+from data.embeddings.embedding_engine import EmbeddingEngine
 import json
 import csv
-from ..milvus.milvus_client import MilvusClient
+from data.milvus.milvus_client import MilvusClient
 import logging
 
 # Setup logger
