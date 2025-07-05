@@ -1,0 +1,14 @@
+{
+    "LLM": {
+        "response_llm": {
+            "model_id": "gemini-2.0-flash",
+            "provider": "google-gla",
+            "base_url": ""
+        }
+    },
+    "Embedding": {
+        "model_id": "text-embedding-3-small",
+        "provider": "openai",
+        "base_url": ""
+    }
+}

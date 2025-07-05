@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "summerschool_workshop"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "adalflow>=1.0.4",
+    "chainlit==2.5.5",
+    "discord-py>=2.5.2",
+    "pydantic-ai==0.1.8",
+    "pymilvus==2.5.8",
+    "python-dotenv==1.1.0",
+    "redis>=6.1.0",
+    "requests>=2.32.2",
+    "rq>=1.10.1",
+    "tiktoken==0.9.0",
+    "uvicorn>=0.34.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.2.0",
+    "mypy>=1.8.0",
+    "flake8>=7.0.0",
+    "promptfoo",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["pymilvus.*"]
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = "E203"
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    "venv",
+    ".tox",
+]
