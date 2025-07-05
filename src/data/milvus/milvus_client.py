@@ -48,27 +48,27 @@ class MilvusClient:
                         name="ID", dtype=DataType.INT64, is_primary=True, auto_id=True
                     ),
                     FieldSchema(
-                        name="question", dtype=DataType.VARCHAR, max_length=65535
+                        name="Question", dtype=DataType.VARCHAR, max_length=65535
                     ),
                     FieldSchema(
-                        name="answer", dtype=DataType.VARCHAR, max_length=65535
+                        name="Answer", dtype=DataType.VARCHAR, max_length=65535
                     ),
                     FieldSchema(
-                        name="question_dense_embedding",
+                        name="Question_dense_embedding",
                         dtype=DataType.FLOAT_VECTOR,
                         dim=384,
                     ),
                     FieldSchema(
-                        name="question_sparse_embedding",
+                        name="Question_sparse_embedding",
                         dtype=DataType.SPARSE_FLOAT_VECTOR,
                     ),
                     FieldSchema(
-                        name="answer_dense_embedding",
+                        name="Answer_dense_embedding",
                         dtype=DataType.FLOAT_VECTOR,
                         dim=384,
                     ),
                     FieldSchema(
-                        name="answer_sparse_embedding",
+                        name="Answer_sparse_embedding",
                         dtype=DataType.SPARSE_FLOAT_VECTOR,
                     ),
                 ],
@@ -78,23 +78,23 @@ class MilvusClient:
 
     def index_data(
         self,
-        questions: List[str],
-        answers: List[str],
-        question_embeddings: List[List[float]],
-        answer_embeddings: List[List[float]],
-        sparse_question_embeddings: Optional[List[List[float]]] = None,
-        sparse_answer_embeddings: Optional[List[List[float]]] = None,
+        Questions: List[str],
+        Answers: List[str],
+        Question_embeddings: List[List[float]],
+        Answer_embeddings: List[List[float]],
+        sparse_Question_embeddings: Optional[List[List[float]]] = None,
+        sparse_Answer_embeddings: Optional[List[List[float]]] = None,
     ):
         """
-        Index questions, answers, and their embeddings (both dense and sparse) into the Milvus collection.
+        Index Questions, Answers, and their embeddings (both dense and sparse) into the Milvus collection.
 
         Args:
-            questions: List of question strings to be indexed.
-            answers: List of answer strings corresponding to the questions.
-            question_embeddings: List of dense embeddings for the questions.
-            answer_embeddings: List of dense embeddings for the answers.
-            sparse_question_embeddings: Optional list of sparse embeddings for questions.
-            sparse_answer_embeddings: Optional list of sparse embeddings for answers.
+            Questions: List of Question strings to be indexed.
+            Answers: List of Answer strings corresponding to the Questions.
+            Question_embeddings: List of dense embeddings for the Questions.
+            Answer_embeddings: List of dense embeddings for the Answers.
+            sparse_Question_embeddings: Optional list of sparse embeddings for Questions.
+            sparse_Answer_embeddings: Optional list of sparse embeddings for Answers.
         """
         # Ensure connection before proceeding
         self._ensure_connection()
@@ -102,28 +102,28 @@ class MilvusClient:
         try:
             # Prepare the data to be inserted into Milvus
             entities = [
-                {"name": "question", "values": questions, "type": DataType.VARCHAR},
-                {"name": "answer", "values": answers, "type": DataType.VARCHAR},
-                {"name": "question_dense_embedding", "values": question_embeddings, "type": DataType.FLOAT_VECTOR},
-                {"name": "answer_dense_embedding", "values": answer_embeddings, "type": DataType.FLOAT_VECTOR}
+                {"name": "Question", "values": Questions, "type": DataType.VARCHAR},
+                {"name": "Answer", "values": Answers, "type": DataType.VARCHAR},
+                {"name": "Question_dense_embedding", "values": Question_embeddings, "type": DataType.FLOAT_VECTOR},
+                {"name": "Answer_dense_embedding", "values": Answer_embeddings, "type": DataType.FLOAT_VECTOR}
             ]
             
             # Add sparse embeddings if provided
-            if sparse_question_embeddings:
+            if sparse_Question_embeddings:
                 entities.append(
-                    {"name": "question_sparse_embedding", "values": sparse_question_embeddings, "type": DataType.SPARSE_FLOAT_VECTOR}
+                    {"name": "Question_sparse_embedding", "values": sparse_Question_embeddings, "type": DataType.SPARSE_FLOAT_VECTOR}
                 )
-            if sparse_answer_embeddings:
+            if sparse_Answer_embeddings:
                 entities.append(
-                    {"name": "answer_sparse_embedding", "values": sparse_answer_embeddings, "type": DataType.SPARSE_FLOAT_VECTOR}
+                    {"name": "Answer_sparse_embedding", "values": sparse_Answer_embeddings, "type": DataType.SPARSE_FLOAT_VECTOR}
                 )
 
             # Insert data into Milvus collection
-            print(f"Inserting {len(questions)} records into Milvus...")
+            print(f"Inserting {len(Questions)} records into Milvus...")
             insert_result = self.collection.insert(entities)
 
             # Check if the data was successfully inserted
-            if insert_result.insert_count == len(questions):
+            if insert_result.insert_count == len(Questions):
                 print(f"Successfully indexed {insert_result.insert_count} records.")
             else:
                 print(f"Failed to insert all records. Only {insert_result.insert_count} were indexed.")
@@ -138,15 +138,15 @@ class MilvusClient:
     def create_index(self):
         """Create an index on the collection's vector fields for fast similarity search."""
         try:
-            print("Creating index for question dense embedding...")
+            print("Creating index for Question dense embedding...")
             self.collection.create_index(
-                field_name="question_dense_embedding", 
+                field_name="Question_dense_embedding", 
                 index_params={"metric_type": "L2", "index_type": "IVF_FLAT", "params": {"nlist": 128}}
             )
 
-            print("Creating index for answer dense embedding...")
+            print("Creating index for Answer dense embedding...")
             self.collection.create_index(
-                field_name="answer_dense_embedding", 
+                field_name="Answer_dense_embedding", 
                 index_params={"metric_type": "L2", "index_type": "IVF_FLAT", "params": {"nlist": 128}}
             )
             print("Index creation successful.")
@@ -175,7 +175,7 @@ class MilvusClient:
             query_text: The text query for BM25 search
             query_dense_embedding: The dense embedding vector for semantic search
             limit: Maximum number of results to return
-            search_answers: If True, search in answer embeddings instead of questions
+            search_answers: If True, search in Answer embeddings instead of Questions
             ranker_weights: Optional list of weights for the WeightedRanker (default is [0.7, 0.3])
 
         Returns:
@@ -192,12 +192,12 @@ class MilvusClient:
             print(f"Error loading collection: {str(e)}")
             return []
 
-        # Define search fields based on whether we're searching answers or questions
+        # Define search fields based on whether we're searching Answers or Questions
         dense_field = (
-            "answer_dense_embedding" if search_answers else "question_dense_embedding"
+            "Answer_dense_embedding" if search_answers else "Question_dense_embedding"
         )
         sparse_field = (
-            "answer_sparse_embedding" if search_answers else "question_sparse_embedding"
+            "Answer_sparse_embedding" if search_answers else "Question_sparse_embedding"
         )
 
         # Parameters for dense vector search
@@ -242,7 +242,7 @@ class MilvusClient:
                 reqs=[request_1, request_2],  # Method expects 'data' parameter
                 rerank=weight_ranker,  # Use rerank parameter with the WeightedRanker
                 limit=10,  # Overall limit for results
-                output_fields=["question", "answer"],
+                output_fields=["Question", "Answer"],
             )
             # Format results
             output = []
@@ -250,8 +250,8 @@ class MilvusClient:
                 for hit in hits:
                     output.append(
                         {
-                            "question": hit.entity.get("question"),
-                            "answer": hit.entity.get("answer"),
+                            "Question": hit.entity.get("Question"),
+                            "Answer": hit.entity.get("Answer"),
                             "score": hit.score,
                         }
                     )
@@ -269,15 +269,15 @@ class MilvusClient:
                     anns_field=dense_field,
                     param=dense_search_params,
                     limit=limit,
-                    output_fields=["question", "answer"],
+                    output_fields=["Question", "Answer"],
                 )
                 output = []
                 for hits in search_results:  # type: ignore
                     for hit in hits:
                         output.append(
                             {
-                                "question": hit.entity.get("question"),
-                                "answer": hit.entity.get("answer"),
+                                "Question": hit.entity.get("Question"),
+                                "Answer": hit.entity.get("Answer"),
                                 "score": hit.score,
                             }
                         )
