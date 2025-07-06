@@ -11,7 +11,7 @@ class StudentType(str, Enum):
     QUOC_TE = "quốc tế"
 
 class SearchInput(BaseModel):
-    query: str = Field(..., description="Input the query")
+    query: str = Field(..., description="Search the query")
 
 
 class SearchOutput(BaseModel):
