@@ -1,5 +1,6 @@
 import requests
 from pydantic import BaseModel, Field
+from bs4 import BeautifulSoup
 
 class SearchInput(BaseModel):
     query: str = Field(..., description="Search query")
@@ -18,9 +19,8 @@ def search_web(input: SearchInput) -> SearchOutput:
 
     response = requests.get(url, params=params, headers=headers)
     if response.status_code != 200:
-        return []
+        return SearchOutput(results=[])
 
-    from bs4 import BeautifulSoup
     soup = BeautifulSoup(response.text, "html.parser")
     results = []
     for result in soup.select(".result__title a")[:input.max_results]:
@@ -28,4 +28,4 @@ def search_web(input: SearchInput) -> SearchOutput:
         link = result["href"]
         results.append({"title": title, "link": link})
     
-    return results
+    return SearchOutput(results=results)
