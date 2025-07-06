@@ -11,10 +11,11 @@ class StudentType(str, Enum):
     QUOC_TE = "quốc tế"
 
 class SearchInput(BaseModel):
-    query: str
+    query: str = Field(..., description="Input the query")
+
 
 class SearchOutput(BaseModel):
-    results: str
+    results: str = Field(..., description="Determining the student type")
 
 
 # ---------- Gemini REST call ----------
