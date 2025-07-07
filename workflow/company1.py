@@ -1,23 +1,41 @@
-import os
-import chainlit as cl
+from data.milvus.indexing import MilvusIndexer
+
 from pydantic_ai.models.gemini import GeminiModel
 from pydantic_ai.providers.google_gla import GoogleGLAProvider
-from utils.basetools.faq_tool import faq_tool
-from utils.basetools.calculator_tool import calculate_expression, basic_math, trigonometry, logarithm, calculator_memory
-from data.prompts.admission_prompt import ADMISSION_PROMPT
+import os
+
 from llm.base import AgentClient
+from utils.basetools.faq_tool import create_faq_tool
+from utils.basetools.send_email_tool import send_email_tool
+from data.prompts.company1 import SYSTEM_PROMT
+
+import chainlit as cl
 from data.cache.memory_handler import MessageMemoryHandler
+
+
+# Initialize Milvus indexer (run only once to create collection and index data)
+
+
+# indexer = MilvusIndexer(collection_name="ptdung_test", faq_file="src/data/mock_data/admission_faq_large.xlsx")
+# indexer.run() 
+
+
+# Comment this out after first run
 
 # Initialize AI components
 provider = GoogleGLAProvider(api_key=os.getenv("GEMINI_API_KEY"))
 model = GeminiModel('gemini-2.0-flash', provider=provider)
 
+# Create FAQ tool with custom collection name
+faq_tool = create_faq_tool(collection_name="ptdung_test")
+
 # Create agent with tools
 agent = AgentClient(
     model=model,
-    system_prompt=ADMISSION_PROMPT,
-    tools=[faq_tool, calculate_expression, basic_math, trigonometry, logarithm, calculator_memory]
+    system_prompt=SYSTEM_PROMT,
+    tools=[faq_tool, send_email_tool]
 ).create_agent()
+
 
 # Initialize memory handler
 memory_handler = MessageMemoryHandler(max_messages=15)
@@ -40,3 +58,4 @@ async def main(message: cl.Message):
     except Exception as e:
         memory_handler.store_error(e)
         await cl.Message(content=f"❌ **Lỗi:** {str(e)}\n\nVui lòng thử lại.").send()
+
