@@ -7,8 +7,6 @@ from data.cache.redis_cache import ShortTermMemory
 
 
 class MessageMemoryHandler:
-    """Handle memory only - no AI logic"""
-    
     def __init__(self, max_messages: int = 15):
         self.session_manager = ShortTermMemory(max_messages=max_messages)
     
