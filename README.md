@@ -42,7 +42,7 @@ A private Python-based project for experimenting with advanced data retrieval an
 4. **Run a Demo**  
    To start the conversational demo (requires Chainlit):
    ```
-   chainlit run workflow/demo.py
+   chainlit run workflow/demo_with_memory.py
    ```
 
 ## Project Structure
