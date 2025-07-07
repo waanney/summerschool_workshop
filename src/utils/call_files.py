@@ -4,11 +4,3 @@ from data.prompts.admission_prompt import ADMISSION_PROMPT
 from llm.base import AgentClient
 from data.cache.redis_cache import ShortTermMemory
 from handlers.ui_handlers import create_chat_handlers 
-
-session_manager = ShortTermMemory()
-agent = AgentClient(
-    system_prompt=ADMISSION_PROMPT,
-    tools=[faq_tool, calculate_expression, basic_math, trigonometry, logarithm, calculator_memory]
-).create_agent()
-
-create_chat_handlers(session_manager, agent)
