@@ -12,6 +12,7 @@ import json
 import csv
 from data.milvus.milvus_client import MilvusClient
 import logging
+import pandas as pd
 # Setup logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,6 +21,7 @@ class MilvusIndexer:
     def __init__(self, collection_name="summerschool_workshop", faq_file="src/data/mock_data/admission_faq_large.csv"):
         self.collection_name = collection_name
         self.faq_file = faq_file
+        self.file_type = "csv" if faq_file.endswith(".csv") else "xlsx"
         self.milvus_client = MilvusClient()
         self.collection = None
 
@@ -100,7 +102,7 @@ class MilvusIndexer:
             logger.error(f"Error creating collection: {e}")
             raise e
 
-    def load_faq_data(self):
+    def load_faq_data_from_csv(self):
         """Load FAQ data from the specified CSV file."""
         with open(self.faq_file, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
@@ -109,6 +111,41 @@ class MilvusIndexer:
         logger.info(f"Loaded {len(data)} FAQ entries from {self.faq_file}.")
         return json.loads(json_data)
 
+    def load_faq_data_from_xlsx(self):
+        """Load FAQ data from the XLSX file with many sheets."""
+        data = []
+        try:
+            # Try different engines for Excel files
+            engines = ['openpyxl', 'xlrd', 'calamine']
+            xls = None
+            
+            for engine in engines:
+                try:
+                    xls = pd.ExcelFile(self.faq_file, engine=engine)  # type: ignore
+                    logger.info(f"Successfully opened Excel file using {engine} engine")
+                    break
+                except Exception as engine_error:
+                    logger.warning(f"Failed to open with {engine} engine: {engine_error}")
+                    continue
+            
+            if xls is None:
+                raise Exception(f"Could not open Excel file {self.faq_file} with any available engine. Make sure the file is a valid Excel file (.xlsx, .xls)")
+            
+            for sheet_name in xls.sheet_names:
+                df = pd.read_excel(xls, sheet_name=sheet_name)
+                for _, row in df.iterrows():
+                    if pd.notna(row["Question"]) and pd.notna(row["Answer"]):
+                        data.append({
+                            "Question": row["Question"],
+                            "Answer": row["Answer"]
+                        })
+            json_data = json.dumps(data, ensure_ascii=False)
+            logger.info(f"Loaded {len(data)} FAQ entries from {self.faq_file}.")
+            return json.loads(json_data)
+        except Exception as e:
+            logger.error(f"Error loading data from XLSX: {e}")
+            raise e
+    
     def generate_embeddings(self, data):
         """Generate dense and sparse embeddings for Questions and Answers."""
         Questions = [item["Question"] for item in data]
@@ -125,6 +162,10 @@ class MilvusIndexer:
     def insert_data(self, data):
         """Insert data into the Milvus collection."""
         try:
+            # Ensure collection is loaded
+            if self.collection is None:
+                raise Exception("Collection is not created. Call create_collection() first.")
+            
             Questions, Answers, Question_dense_embeddings, Answer_dense_embeddings = (
                 self.generate_embeddings(data)
             )
@@ -139,6 +180,10 @@ class MilvusIndexer:
             logger.info(f"Inserting {len(Questions)} FAQ entries into collection '{self.collection_name}'")
             insert_result = self.collection.insert(entities)
             
+            # Flush to ensure data is persisted
+            self.collection.flush()
+            logger.info("Data flushed to ensure persistence")
+            
             if hasattr(insert_result, 'insert_count'):
                 logger.info(f"Successfully inserted {insert_result.insert_count} records")
             else:
@@ -151,6 +196,10 @@ class MilvusIndexer:
     def create_index(self):
         """Create indexes for dense and sparse embeddings."""
         try:
+            # Ensure collection is created
+            if self.collection is None:
+                raise Exception("Collection is not created. Call create_collection() first.")
+            
             dense_index_params = {
                 "index_type": "IVF_FLAT",
                 "metric_type": "L2",
@@ -189,6 +238,10 @@ class MilvusIndexer:
             
             logger.info("All indexes created successfully")
             
+            # Load the collection after all indexes are created
+            self.collection.load()
+            logger.info(f"Collection '{self.collection_name}' loaded successfully")
+            
         except Exception as e:
             logger.error(f"Error creating index: {e}")
             raise e
@@ -198,11 +251,9 @@ class MilvusIndexer:
         self.connect()
         self.create_collection()
         self.create_index()
-        faq_data = self.load_faq_data()
+        
+        loader = self.load_faq_data_from_csv if self.file_type == "csv" else self.load_faq_data_from_xlsx
+        faq_data = loader()
+        
         self.insert_data(faq_data)
         logger.info("Data has been successfully inserted into Milvus.")
-
-
-if __name__ == "__main__":
-    indexer = MilvusIndexer()
-    indexer.run()
