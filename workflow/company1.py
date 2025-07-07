@@ -16,8 +16,8 @@ from data.cache.memory_handler import MessageMemoryHandler
 # Initialize Milvus indexer (run only once to create collection and index data)
 
 
-# indexer = MilvusIndexer(collection_name="ptdung_test", faq_file="src/data/mock_data/admission_faq_large.xlsx")
-# indexer.run() 
+indexer = MilvusIndexer(collection_name="ptdung_test", faq_file="src/data/mock_data/admission_faq_large.xlsx")
+indexer.run() 
 
 
 # Comment this out after first run
@@ -31,7 +31,6 @@ faq_tool = create_faq_tool(collection_name="ptdung_test")
 
 # Create agent with tools
 agent = AgentClient(
-    model=model,
     system_prompt=SYSTEM_PROMT,
     tools=[faq_tool, send_email_tool]
 ).create_agent()
