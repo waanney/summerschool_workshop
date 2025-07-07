@@ -61,7 +61,7 @@ def send_email_tool(input_data: EmailToolInput) -> EmailToolOutput:
             server.sendmail(
                 sender_email,
                 input_data.to_emails,
-                msg.as_string()
+                message.as_string()
             )
 
         return EmailToolOutput(success=True, message=f"Email sent to {', '.join(input_data.to_emails)}")
