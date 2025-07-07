@@ -8,11 +8,13 @@ version = "0.1.0"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+        "mcp[cli]",
+    "adalflow>=1.0.4",
     "adalflow>=1.0.4",
     "beautifulsoup4>=4.12.0",
     "chainlit>=2.5.5",
     "discord-py>=2.5.2",
-    "fastmcp>=2.10.2",
+
     "google-generativeai>=0.8.5",
     "pydantic-ai>=0.1.8",
     "pymilvus>=2.5.8",
@@ -26,7 +28,8 @@ dependencies = [
     "jellyfish>=1.2.0",
     "google-generativeai>=0.8.5",
     "instructor>=1.9.0",
-    "PyPDF2>=3.0.0"
+    "PyPDF2>=3.0.0",
+    "python-docx>=1.1.2"
 ]
 
 [project.optional-dependencies]
