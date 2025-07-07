@@ -1,42 +1,12 @@
-import os
-import chainlit as cl
-from pydantic_ai.models.gemini import GeminiModel
-from pydantic_ai.providers.google_gla import GoogleGLAProvider
-from utils.basetools.faq_tool import faq_tool
-from utils.basetools.calculator_tool import calculate_expression, basic_math, trigonometry, logarithm, calculator_memory
-from data.prompts.admission_prompt import ADMISSION_PROMPT
 from llm.base import AgentClient
-from data.cache.memory_handler import MessageMemoryHandler
+from data.cache.redis_cache import ShortTermMemory
+from handlers.ui_handlers import create_chat_handlers 
+from utils.basetools.send_email_tool import send_email_tool
 
-# Initialize AI components
-provider = GoogleGLAProvider(api_key=os.getenv("GEMINI_API_KEY"))
-model = GeminiModel('gemini-2.0-flash', provider=provider)
-
-# Create agent with tools
+session_manager = ShortTermMemory()
 agent = AgentClient(
-    model=model,
-    system_prompt=ADMISSION_PROMPT,
-    tools=[faq_tool, calculate_expression, basic_math, trigonometry, logarithm, calculator_memory]
+    system_prompt="You are a excellent assistant, who can help everything that users require",
+    tools=[send_email_tool]
 ).create_agent()
 
-# Initialize memory handler
-memory_handler = MessageMemoryHandler(max_messages=15)
-
-@cl.on_chat_start
-async def start():
-    """Initialize chat session"""
-    cl.user_session.set("message_count", 0)
-    await cl.Message(content="🎓 **Chào mừng đến với Hệ thống FAQ Tuyển sinh thông minh với Memory!**").send()
-
-@cl.on_message
-async def main(message: cl.Message):
-    message_with_context = memory_handler.get_history_message(message.content)
-    
-    try:
-        response = await agent.run(message_with_context)
-        memory_handler.store_bot_response(response.output)
-        await cl.Message(content=str(response.output)).send()
-        
-    except Exception as e:
-        memory_handler.store_error(e)
-        await cl.Message(content=f"❌ **Lỗi:** {str(e)}\n\nVui lòng thử lại.").send()
+create_chat_handlers(session_manager, agent)

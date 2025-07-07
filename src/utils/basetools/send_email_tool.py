@@ -1,5 +1,6 @@
 import smtplib
 import os
+import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import List, Optional
@@ -16,8 +17,7 @@ class EmailToolInput(BaseModel):
     
 class EmailToolOutput(BaseModel):
     success: bool = Field(..., description="Indicates whether the email was sent successfully")
-    message: str = Field(..., description="Message indicating the result of the email sending operation")
-
+    message: str = Field(..., description="Result message of the email sending operation")
 
 def send_email_tool(input_data: EmailToolInput) -> EmailToolOutput:
     """
@@ -61,8 +61,9 @@ def send_email_tool(input_data: EmailToolInput) -> EmailToolOutput:
             server.sendmail(
                 sender_email,
                 input_data.to_emails,
-                message.as_string()
+                msg.as_string()
             )
-        return EmailToolOutput(success=True, message=f"Email sent successfully to {', '.join(input_data.to_emails)}")
+
+        return EmailToolOutput(success=True, message=f"Email sent to {', '.join(input_data.to_emails)}")
     except Exception as e:
         return EmailToolOutput(success=False, message=f"Failed to send email: {str(e)}")
