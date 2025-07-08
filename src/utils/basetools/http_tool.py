@@ -53,11 +53,9 @@ class HttpResponse(BaseModel):
     status_code: int
     headers: Dict[str, str]
     body: Union[Dict[str, Any], str, bytes]
+    
+    
 def http_tool(req: HttpRequest) -> HttpResponse:
-
-
-
-
     kwargs: Dict[str, Any] = {
         "url": str(req.url),
         "headers": req.headers,
