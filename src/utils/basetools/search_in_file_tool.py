@@ -32,3 +32,21 @@ def search_in_file(input: SearchInput) -> SearchOutput:
                 break
 
     return SearchOutput(results=results)
+
+def create_search_in_file_tool(file_path: str = "src/data/mock_data/admission_faq_large.csv"):
+    """
+    Create a search tool function with a pre-configured file path.
+    
+    Args:
+        file_path: Path to the CSV file to search in
+        
+    Returns:
+        A function that performs searches in the specified CSV file
+    """
+    def configured_search_in_file(input: SearchInput) -> SearchOutput:
+        if input.file_path == "src/data/mock_data/admission_faq_large.csv":
+            input.file_path = file_path
+        
+        return search_in_file(input)
+    
+    return configured_search_in_file
