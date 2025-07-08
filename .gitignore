@@ -92,3 +92,4 @@ dmypy.json
 pyrightconfig.json
 conversation_log.md
 .idea
+.env2
