@@ -1,12 +1,9 @@
-from pymilvus import Collection
 from data.embeddings.embedding_engine import EmbeddingEngine
 from data.milvus.milvus_client import MilvusClient
-from typing import List, Optional
+from typing import List
 from pydantic import BaseModel, Field
 from typing import Dict, Any
 
-milvus_client = MilvusClient()
-milvus_client._connect()
 embedding_engine = EmbeddingEngine()
 
 class SearchInput(BaseModel):
@@ -15,9 +12,6 @@ class SearchInput(BaseModel):
     search_answers: bool = Field(
         False, description="Whether to search in answer embeddings"
     )
-    collection_name: str = Field(
-        "summerschool_workshop", description="Name of the Milvus collection to search in"
-    )
 
 
 class SearchOutput(BaseModel):
@@ -25,12 +19,8 @@ class SearchOutput(BaseModel):
         ..., description="Search results containing questions and answers"
     )
 
-def faq_tool(input: SearchInput) -> SearchOutput:
-    # Create a new MilvusClient instance with the specified collection name
-    client = MilvusClient()
-    client.collection_name = input.collection_name
-    client._ensure_collection_exists()
-    client.collection = Collection(input.collection_name)
+def faq_tool(input: SearchInput, collection_name: str = "summerschool_workshop") -> SearchOutput:
+    client = MilvusClient(collection_name=collection_name)
     
     query_embedding = embedding_engine.get_query_embedding(input.query)
 
@@ -53,9 +43,7 @@ def create_faq_tool(collection_name: str = "summerschool_workshop"):
         A function that performs FAQ searches using the specified collection
     """
     def configured_faq_tool(input: SearchInput) -> SearchOutput:
-        if input.collection_name == "summerschool_workshop":
-            input.collection_name = collection_name
-        
-        return faq_tool(input)
+        # Collection name is fixed and cannot be changed by the agent
+        return faq_tool(input, collection_name=collection_name)
     
     return configured_faq_tool
