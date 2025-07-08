@@ -67,3 +67,19 @@ def send_email_tool(input_data: EmailToolInput) -> EmailToolOutput:
         return EmailToolOutput(success=True, message=f"Email sent to {', '.join(input_data.to_emails)}")
     except Exception as e:
         return EmailToolOutput(success=False, message=f"Failed to send email: {str(e)}")
+    
+def create_send_email_tool(to_emails: List[str]):
+    """
+    Create a send email tool function with pre-configured recipient emails.
+    
+    Args:
+        to_emails: List of recipient email addresses (default: None)
+        
+    Returns:
+        A function that sends emails with the specified recipients
+    """
+    def configured_send_email_tool(input_data: EmailToolInput) -> EmailToolOutput:
+        input_data.to_emails = to_emails
+        return send_email_tool(input_data)
+    
+    return configured_send_email_tool

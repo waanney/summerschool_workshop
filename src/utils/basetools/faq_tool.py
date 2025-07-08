@@ -5,8 +5,6 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from typing import Dict, Any
 
-milvus_client = MilvusClient()
-milvus_client._connect()
 embedding_engine = EmbeddingEngine()
 
 class SearchInput(BaseModel):
@@ -26,11 +24,7 @@ class SearchOutput(BaseModel):
     )
 
 def faq_tool(input: SearchInput) -> SearchOutput:
-    # Create a new MilvusClient instance with the specified collection name
-    client = MilvusClient()
-    client.collection_name = input.collection_name
-    client._ensure_collection_exists()
-    client.collection = Collection(input.collection_name)
+    client = MilvusClient(collection_name=input.collection_name)
     
     query_embedding = embedding_engine.get_query_embedding(input.query)
 

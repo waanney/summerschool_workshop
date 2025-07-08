@@ -13,8 +13,8 @@ import os
 
 
 class MilvusClient:
-    def __init__(self):
-        self.collection_name = "summerschool_workshop"
+    def __init__(self, collection_name: str = "summerschool_workshop"):
+        self.collection_name = collection_name
         self._connect()
         self._ensure_collection_exists()
         self.collection = Collection(self.collection_name)
