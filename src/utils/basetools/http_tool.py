@@ -3,23 +3,27 @@ from typing import Dict, Any, Optional, Union
 import json
 from enum import Enum
 import requests
+
+
 class BodyType(str, Enum):
     JSON = "json"
     FORM = "form"
-    RAW  = "raw"
+    RAW = "raw"
+
 
 class ResponseType(str, Enum):
-    JSON  = "json"
-    TEXT  = "text"
+    JSON = "json"
+    TEXT = "text"
     BYTES = "bytes"
 
+
 class HTTPMethod(str, Enum):
-    GET    = "GET"
-    POST   = "POST"
-    PUT    = "PUT"
+    GET = "GET"
+    POST = "POST"
+    PUT = "PUT"
     DELETE = "DELETE"
-    PATCH  = "PATCH"
-    HEAD   = "HEAD"
+    PATCH = "PATCH"
+    HEAD = "HEAD"
     OPTIONS = "OPTIONS"
 
 
@@ -35,7 +39,6 @@ class HttpRequest(BaseModel):
     response_type: ResponseType = ResponseType.JSON
     timeout: int = 10
 
-
     def model_post_init(self, __context):
         """
         Nếu body_type == RAW, mà body là dict ⇒ chuyển sang chuỗi JSON.
@@ -48,13 +51,12 @@ class HttpRequest(BaseModel):
             )
 
 
-
 class HttpResponse(BaseModel):
     status_code: int
     headers: Dict[str, str]
     body: Union[Dict[str, Any], str, bytes]
-    
-    
+
+
 def http_tool(req: HttpRequest) -> HttpResponse:
     kwargs: Dict[str, Any] = {
         "url": str(req.url),

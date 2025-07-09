@@ -3,12 +3,16 @@ from enum import Enum
 from typing import Dict, Any, List
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+
 load_dotenv()
+
+
 # ---------- Schemas ----------
 class StudentType(str, Enum):
     GIOI = "giỏi"
     KHO_KHAN = "khó khăn"
     QUOC_TE = "quốc tế"
+
 
 class SearchInput(BaseModel):
     query: str = Field(..., description="Search the query")
