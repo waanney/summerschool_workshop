@@ -1,5 +1,6 @@
 import logging
 
+
 def setup_logger(log_file="app.log"):
     """Configure the logging system."""
     logger = logging.getLogger(__name__)
@@ -8,7 +9,7 @@ def setup_logger(log_file="app.log"):
     # Log to file
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(logging.ERROR)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     file_handler.setFormatter(formatter)
 
     # Log to console

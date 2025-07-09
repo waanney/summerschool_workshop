@@ -6,6 +6,7 @@ from typing import Dict, Any
 
 embedding_engine = EmbeddingEngine()
 
+
 class SearchInput(BaseModel):
     query: str = Field(..., description="Search query")
     limit: int = Field(3, description="Number of top results to return")
@@ -19,9 +20,12 @@ class SearchOutput(BaseModel):
         ..., description="Search results containing questions and answers"
     )
 
-def faq_tool(input: SearchInput, collection_name: str = "summerschool_workshop") -> SearchOutput:
+
+def faq_tool(
+    input: SearchInput, collection_name: str = "summerschool_workshop"
+) -> SearchOutput:
     client = MilvusClient(collection_name=collection_name)
-    
+
     query_embedding = embedding_engine.get_query_embedding(input.query)
 
     results = client.hybrid_search(
@@ -32,18 +36,20 @@ def faq_tool(input: SearchInput, collection_name: str = "summerschool_workshop")
     )
     return SearchOutput(results=results)
 
+
 def create_faq_tool(collection_name: str = "summerschool_workshop"):
     """
     Create a FAQ tool function with a pre-configured collection name.
-    
+
     Args:
         collection_name: Name of the Milvus collection to use for searches
-        
+
     Returns:
         A function that performs FAQ searches using the specified collection
     """
+
     def configured_faq_tool(input: SearchInput) -> SearchOutput:
         # Collection name is fixed and cannot be changed by the agent
         return faq_tool(input, collection_name=collection_name)
-    
+
     return configured_faq_tool
