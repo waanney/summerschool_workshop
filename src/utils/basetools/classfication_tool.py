@@ -1,29 +1,23 @@
-import os, requests, json
-from enum import Enum
-from typing import Dict, Any
+import os
+import json
+import requests
+from typing import Any, Dict, List
+
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-# ---------- Schemas ----------
-class StudentType(str, Enum):
-    GIOI = "giỏi"
-    KHO_KHAN = "khó khăn"
-    QUOC_TE = "quốc tế"
-
-
 class SearchInput(BaseModel):
-    query: str = Field(..., description="Search the query")
-
+    query: str = Field(..., description="Search query")
 
 class SearchOutput(BaseModel):
-    results: str = Field(..., description="Determining the student type")
+    result: str = Field(..., description="Identifying the label")
 
 
-# ---------- Gemini REST call ----------
-API_KEY = os.getenv("GEMINI_API_KEY")
+
+API_KEY: str | None = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
     raise RuntimeError("GEMINI_API_KEY env var is missing")
 
@@ -33,11 +27,25 @@ ENDPOINT = (
 )
 
 
-def classify_scholarship_http(inp: SearchInput) -> SearchOutput:
-    # 1. Build prompt
+
+def classify_scholarship_http(
+    inp: SearchInput,
+    labels: List[str],
+    *,
+    temperature: float = 0.1,
+    timeout: int = 30,
+) -> SearchOutput:
+
+    if not labels or len(set(labels)) < 2:
+        raise ValueError("`labels` must contain at least two distinct strings.")
+
+    labels = [l.strip().lower() for l in labels]
+
+
     system_prompt = (
-        "Bạn là trợ lý học bổng.\n"
-        "Trả lời **duy nhất** một từ: giỏi, khó khăn, hoặc quốc tế."
+        "You are a helpful AI assistant specialised in single‑label text classification.\n"
+        "ONLY reply the exact text of **one** label from the following list (case‑insensitive): "
+        + ", ".join(labels) + "."
     )
     user_prompt = f'Câu hỏi: "{inp.query}"'
 
@@ -49,27 +57,28 @@ def classify_scholarship_http(inp: SearchInput) -> SearchOutput:
         "generationConfig": {"temperature": 0.1},
     }
 
-    # 2. POST to Gemini REST
+
     resp = requests.post(
         ENDPOINT,
         params={"key": API_KEY},
         json=payload,
-        timeout=30,
+        timeout=timeout,
     )
     resp.raise_for_status()
     data = resp.json()
 
-    # 3. Extract model reply
+
     try:
-        reply_text: str = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        reply_text: str = (
+            data["candidates"][0]["content"]["parts"][0]["text"]
+            .strip("“”\"' \n\t\r")
+            .lower()
+        )
     except (KeyError, IndexError):
         raise RuntimeError(f"Unexpected Gemini response: {json.dumps(data)[:200]}…")
 
-    # Optional: normalise
-    reply_text = reply_text.lower().strip("“”\"' ")
 
-    # 4. Validate & return
-    if reply_text not in StudentType._value2member_map_:
-        reply_text = "không thể xác định"  # or any default / error value
+    if reply_text not in labels:
+        reply_text = "không thể xác định"
 
-    return SearchOutput(results=reply_text)
+    return SearchOutput(result=reply_text)
