@@ -50,10 +50,10 @@ def classify_scholarship_http(
 
     payload: Dict[str, Any] = {
         "contents": [
-            {"role": "system", "parts": [{"text": system_prompt}]},
-            {"role": "user",   "parts": [{"text": user_prompt}]},
+            {"role": "user", "parts": [{"text": system_prompt}]},
+            {"role": "user", "parts": [{"text": user_prompt}]},
         ],
-        "generationConfig": {"temperature": temperature},
+        "generationConfig": {"temperature": 0.1},
     }
 
 
