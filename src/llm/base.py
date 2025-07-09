@@ -13,7 +13,7 @@ session_manager = ShortTermMemory(max_messages=15)
 
 
 class AgentClient:
-    def __init__(self, system_prompt: str, tools: List[Callable]):
+    def __init__(self , system_prompt: str, tools: List[Callable], model: GeminiModel = model):
         self.model = model
         self.system_prompt = system_prompt
         self.tools = tools

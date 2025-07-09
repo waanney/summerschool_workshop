@@ -24,10 +24,11 @@ model = GeminiModel('gemini-2.0-flash', provider=provider)
 
 # 3. Create tools
 faq_tool = create_faq_tool(collection_name="mini_qa_agent")
-send_email_tool = create_send_email_tool(to_emails=["admin@example.com"])
+send_email_tool = create_send_email_tool(to_emails=["admin@example.com"],sender_email="sender@example.com", sender_password="your_password_here")
 
 # 4. Create agent
 agent = AgentClient(
+    model=model,
     system_prompt=SYSTEM_PROMPT,
     tools=[faq_tool, send_email_tool]
 ).create_agent()
