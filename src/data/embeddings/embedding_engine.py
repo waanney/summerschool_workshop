@@ -5,12 +5,18 @@ from dotenv import load_dotenv
 # Load environment variables (if needed for other purposes)
 load_dotenv()
 
+
 class EmbeddingEngine:
     """
     A class that wraps the functionality for generating embeddings using Sentence-Transformers,
     with the ability to save and load its state.
     """
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2", save_path: str = "embedding_state.json"):
+
+    def __init__(
+        self,
+        model_name: str = "all-MiniLM-L6-v2",
+        save_path: str = "embedding_state.json",
+    ):
         """
         Initialize the EmbeddingEngine.
 
@@ -41,7 +47,9 @@ class EmbeddingEngine:
             if embedding is not None:
                 embeddings.append(embedding)
             else:
-                print(f"Warning: Embedding generation failed for text: '{text}'. Skipping.")
+                print(
+                    f"Warning: Embedding generation failed for text: '{text}'. Skipping."
+                )
         return embeddings
 
     def get_query_embedding(self, query: str) -> List[float]:
@@ -55,7 +63,6 @@ class EmbeddingEngine:
             The embedding vector of the query.
         """
         return self._generate_embedding(query)
-
 
     def _generate_embedding(self, text: str) -> List[float]:
         """
@@ -75,9 +82,3 @@ class EmbeddingEngine:
         except Exception as e:
             print(f"Error generating embedding for text: '{text}'. Error: {e}")
             return []
-
-
-
-
-
-

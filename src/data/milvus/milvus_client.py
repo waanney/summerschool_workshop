@@ -104,18 +104,34 @@ class MilvusClient:
             entities = [
                 {"name": "Question", "values": Questions, "type": DataType.VARCHAR},
                 {"name": "Answer", "values": Answers, "type": DataType.VARCHAR},
-                {"name": "Question_dense_embedding", "values": Question_embeddings, "type": DataType.FLOAT_VECTOR},
-                {"name": "Answer_dense_embedding", "values": Answer_embeddings, "type": DataType.FLOAT_VECTOR}
+                {
+                    "name": "Question_dense_embedding",
+                    "values": Question_embeddings,
+                    "type": DataType.FLOAT_VECTOR,
+                },
+                {
+                    "name": "Answer_dense_embedding",
+                    "values": Answer_embeddings,
+                    "type": DataType.FLOAT_VECTOR,
+                },
             ]
-            
+
             # Add sparse embeddings if provided
             if sparse_Question_embeddings:
                 entities.append(
-                    {"name": "Question_sparse_embedding", "values": sparse_Question_embeddings, "type": DataType.SPARSE_FLOAT_VECTOR}
+                    {
+                        "name": "Question_sparse_embedding",
+                        "values": sparse_Question_embeddings,
+                        "type": DataType.SPARSE_FLOAT_VECTOR,
+                    }
                 )
             if sparse_Answer_embeddings:
                 entities.append(
-                    {"name": "Answer_sparse_embedding", "values": sparse_Answer_embeddings, "type": DataType.SPARSE_FLOAT_VECTOR}
+                    {
+                        "name": "Answer_sparse_embedding",
+                        "values": sparse_Answer_embeddings,
+                        "type": DataType.SPARSE_FLOAT_VECTOR,
+                    }
                 )
 
             # Insert data into Milvus collection
@@ -126,8 +142,10 @@ class MilvusClient:
             if insert_result.insert_count == len(Questions):
                 print(f"Successfully indexed {insert_result.insert_count} records.")
             else:
-                print(f"Failed to insert all records. Only {insert_result.insert_count} were indexed.")
-            
+                print(
+                    f"Failed to insert all records. Only {insert_result.insert_count} were indexed."
+                )
+
             # Optionally, create an index after inserting data
             self.create_index()
 
@@ -140,22 +158,27 @@ class MilvusClient:
         try:
             print("Creating index for Question dense embedding...")
             self.collection.create_index(
-                field_name="Question_dense_embedding", 
-                index_params={"metric_type": "L2", "index_type": "IVF_FLAT", "params": {"nlist": 128}}
+                field_name="Question_dense_embedding",
+                index_params={
+                    "metric_type": "L2",
+                    "index_type": "IVF_FLAT",
+                    "params": {"nlist": 128},
+                },
             )
 
             print("Creating index for Answer dense embedding...")
             self.collection.create_index(
-                field_name="Answer_dense_embedding", 
-                index_params={"metric_type": "L2", "index_type": "IVF_FLAT", "params": {"nlist": 128}}
+                field_name="Answer_dense_embedding",
+                index_params={
+                    "metric_type": "L2",
+                    "index_type": "IVF_FLAT",
+                    "params": {"nlist": 128},
+                },
             )
             print("Index creation successful.")
         except Exception as e:
             print(f"Error creating index: {e}")
             traceback.print_exc()
-
-   
-
 
     def hybrid_search(
         self,
@@ -256,6 +279,7 @@ class MilvusClient:
                         }
                     )
             print(f"Formatted {len(output)} results")
+            print(output)
             return output
         except Exception as e2:
             print(f"Fallback search also failed: {str(e2)}")
@@ -286,5 +310,3 @@ class MilvusClient:
                 print(f"All search methods failed: {str(e3)}")
                 traceback.print_exc()
                 return []
-    
-    
