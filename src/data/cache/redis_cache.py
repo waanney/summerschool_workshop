@@ -14,7 +14,6 @@ class ShortTermMemory:
 
     def store(self, key: str, message: str):
         """Store a message in Redis, keeping only the latest 'max_messages' messages."""
-        # Push the new message to the list (LPUSH puts it at the front)
         self.redis_client.lpush(key, message)
 
         # Trim the list to ensure it doesn't exceed the max size
