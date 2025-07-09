@@ -1,12 +1,14 @@
-
 import chainlit as cl
 
+
 def create_chat_handlers(session_manager, agent):
-    @cl.on_chat_start 
+    @cl.on_chat_start
     async def start():
         """Initialize chat session"""
         cl.user_session.set("message_count", 0)
-        await cl.Message(content="🎓 **Chào mừng đến với Hệ thống FAQ Tuyển sinh thông minh với Memory!**").send()
+        await cl.Message(
+            content="🎓 **Chào mừng đến với Hệ thống FAQ Tuyển sinh thông minh với Memory!**"
+        ).send()
 
     @cl.on_message
     async def main(message: cl.Message):
@@ -28,5 +30,6 @@ def create_chat_handlers(session_manager, agent):
 
         except Exception as e:
             session_manager.store_error_message(session_key, e)
-            await cl.Message(content=f"❌ **Lỗi:** {str(e)}\n\nVui lòng thử lại.").send()
-
+            await cl.Message(
+                content=f"❌ **Lỗi:** {str(e)}\n\nVui lòng thử lại."
+            ).send()

@@ -16,8 +16,8 @@ from data.cache.memory_handler import MessageMemoryHandler
 # Initialize Milvus indexer (run only once to create collection and index data)
 # Comment this out after first run
 
-# indexer = MilvusIndexer(collection_name="student1", faq_file="src/data/mock_data/admission_faq_large.csv")
-# indexer.run() 
+indexer = MilvusIndexer(collection_name="student1", faq_file="src/data/mock_data/admission_faq_large.csv")
+indexer.run() 
 
 # Comment this out after first run
 
