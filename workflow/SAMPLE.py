@@ -21,7 +21,11 @@ provider = GoogleGLAProvider(api_key=os.getenv("GEMINI_API_KEY"))
 model = GeminiModel('gemini-2.0-flash', provider=provider)
 
 # Initialize your tool 
+#---------------------------------------------
 
+#---------------------------------------------
+
+# Initialize agent with tools
 agent = AgentClient(
     model=model,
     system_prompt="__________________________",  # Replace with your system prompt
