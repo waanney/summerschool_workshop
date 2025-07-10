@@ -27,7 +27,7 @@ def search_relevant_document(input: SearchRelevantDocumentInput) -> SearchReleva
     
     query_embedding = embedding_engine.get_query_embedding(input.user_query)
     
-    search_results = client.hybrid_search(
+    search_results = client.generic_hybrid_search(
         query_dense_embedding=query_embedding,
         limit=input.k,
         query_text=input.user_query
