@@ -11,8 +11,6 @@ from utils.basetools.semantic_splitter import SemanticSplitter, load_txt, load_p
 
 import os
 import traceback
-from typing import List, Dict, Any
-
 from pymilvus import (
     connections,
     utility,
