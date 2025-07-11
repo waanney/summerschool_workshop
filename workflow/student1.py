@@ -27,7 +27,7 @@ model = GeminiModel('gemini-2.0-flash', provider=provider)
 
 # Create FAQ tool with custom collection name
 faq_tool = create_faq_tool(collection_name="student1")
-send_email_tool = create_send_email_tool(to_emails=["dung.phank24@hcmut.edu.vn"])
+send_email_tool = create_send_email_tool(to_emails=["dung.phank24@gmail.com"],sender_email="phanthuydung6666@gmail.com", sender_password="iacitofldpfeyyvo")
 
 # Create agent with tools
 agent = AgentClient(
