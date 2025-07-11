@@ -9,12 +9,6 @@ from pydantic import BaseModel, Field
 class EmailToolInput(BaseModel):
     subject: str = Field(..., description="The subject of the email")
     body: str = Field(..., description="The body of the email (plain text)")
-    smtp_server: Optional[str] = Field(
-        default="smtp.gmail.com", description="SMTP server address (default: Gmail)"
-    )
-    smtp_port: Optional[int] = Field(
-        default=587, description="SMTP server port (default: 587 for TLS)"
-    )
 
 
 class EmailToolOutput(BaseModel):
