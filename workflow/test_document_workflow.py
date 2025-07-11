@@ -2,7 +2,8 @@ from utils.basetools.document_chunking_tool import document_chunking_tool, Docum
 from utils.basetools.search_relevant_document_tool import search_relevant_document, SearchRelevantDocumentInput
 
 def run_document_workflow_test():
-    test_document_path = "D:/HUNG-DUNG/work/ura/summerschool_workshop/src/data/mock_data/test_document.txt"
+    import os
+    test_document_path = os.path.join(os.path.dirname(__file__), "../data/mock_data/test_document.txt")
     collection_name = "test_document_collection"
 
     print(f"--- Starting Document Workflow Test ---")
