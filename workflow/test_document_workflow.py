@@ -11,9 +11,11 @@ def run_document_workflow_test():
     # Test Document Chunking Tool
     print(f"\n--- Testing document_chunking_tool ---")
     chunking_input = DocumentChunkingInput(
+        model_name="gemini-2.0-flash",
+        overlap=0,
         document_path=test_document_path,
         collection_name=collection_name,
-        language="vi", # Assuming the test document is in English
+        language="vi", #
         max_tokens=50,
         min_similarity=0.5
     )
