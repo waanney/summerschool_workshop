@@ -5,7 +5,6 @@ from data.milvus.indexing import MilvusIndexer, logger
 from pydantic import BaseModel, Field
 from pathlib import Path
 import tempfile
-from data.embeddings.embedding_engine import EmbeddingEngine
 from data.milvus.milvus_client import MilvusClient
 from utils.basetools.semantic_splitter import SemanticSplitter, load_txt, load_pdf, load_docx
 
