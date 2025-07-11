@@ -310,3 +310,138 @@ class MilvusClient:
                 print(f"All search methods failed: {str(e3)}")
                 traceback.print_exc()
                 return []
+
+    def generic_hybrid_search(
+            self,
+            query_text: str,
+            query_dense_embedding: List[float],
+            limit: int = 10,
+            fields_to_search: Optional[List[str]] = None,
+            dense_weight: float = 0.7,
+            sparse_weight: float = 0.3,
+            output_fields: Optional[List[str]] = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Performs a generic, multi-field hybrid search on the collection.
+
+        If `fields_to_search` is not provided, it will automatically discover all text
+        fields that have corresponding `_dense_embedding` and `_sparse_embedding` fields
+        and search across all of them.
+
+        Args:
+            query_text: The raw text query for sparse (keyword) search.
+            query_dense_embedding: The dense vector for semantic search.
+            limit: The maximum number of results to return.
+            fields_to_search: Optional list of text field names to search (e.g., ['title', 'content']).
+                              If None, all valid text fields will be discovered and used.
+            dense_weight: The weight for dense search results in the ranker.
+            sparse_weight: The weight for sparse search results in the ranker.
+            output_fields: Optional list of fields to return. If None, returns all non-vector fields.
+
+        Returns:
+            A list of result dictionaries, each containing the output fields and a combined score.
+        """
+        self._ensure_connection()
+        try:
+            self.collection.load()
+        except Exception as e:
+            print(f"Error loading collection: {e}")
+            return []
+
+        # --- 1. Discover Fields if Not Provided ---
+        if not fields_to_search:
+            print("`fields_to_search` not provided. Auto-discovering searchable fields...")
+            fields_to_search = []
+            all_field_names = {f.name for f in self.collection.schema.fields}
+
+            # A field is considered a "searchable text field" if it's a VARCHAR and
+            # its corresponding dense and sparse embedding fields exist.
+            for field_schema in self.collection.schema.fields:
+                if field_schema.dtype == DataType.VARCHAR:
+                    field_name = field_schema.name
+                    dense_field = f"{field_name}_dense_embedding"
+                    sparse_field = f"{field_name}_sparse_embedding"
+                    if dense_field in all_field_names and sparse_field in all_field_names:
+                        fields_to_search.append(field_name)
+
+            if not fields_to_search:
+                raise ValueError(
+                    "Could not auto-discover any valid text fields for hybrid search. Ensure fields follow the `_dense_embedding` and `_sparse_embedding` naming convention.")
+            print(f"Auto-discovered fields: {fields_to_search}")
+
+        # --- 2. Prepare Search Requests and Weights ---
+        search_requests = []
+        ranker_weights = []
+        dense_params = {"metric_type": "L2", "params": {"nprobe": 10}}
+        sparse_params = {"metric_type": "BM25", "params": {}}  # BM25 uses text query
+
+        for field in fields_to_search:
+            # Dense request
+            search_requests.append(AnnSearchRequest(
+                data=[query_dense_embedding],
+                anns_field=f"{field}_dense_embedding",
+                param=dense_params,
+                limit=limit * 2,
+            ))
+            ranker_weights.append(dense_weight)
+
+            # Sparse request
+            search_requests.append(AnnSearchRequest(
+                data=[query_text],  # Use raw text for BM25
+                anns_field=f"{field}_sparse_embedding",
+                param=sparse_params,
+                limit=limit * 2,
+            ))
+            ranker_weights.append(sparse_weight)
+
+        # --- 3. Determine Output Fields ---
+        if not output_fields:
+            output_fields = [f.name for f in self.collection.schema.fields if
+                             f.dtype not in [DataType.FLOAT_VECTOR, DataType.SPARSE_FLOAT_VECTOR]]
+
+        # --- 4. Execute Search ---
+        try:
+            reranker = WeightedRanker(*ranker_weights)
+            print(f"Executing generic hybrid search with weights {ranker_weights}...")
+            results = self.collection.hybrid_search(
+                reqs=search_requests,
+                rerank=reranker,
+                limit=limit,
+                output_fields=output_fields,
+            )
+
+            formatted_results = []
+            if results:
+                for hit in results[0]:  # Results are in the first element
+                    entity_data = {"score": hit.score}
+                    for field in output_fields:
+                        entity_data[field] = hit.entity.get(field)
+                    formatted_results.append(entity_data)
+            return formatted_results
+
+        except Exception as e:
+            print(f"Generic hybrid search failed: {e}")
+            traceback.print_exc()
+            # Fallback to simple dense search on the first field
+            print(f"Falling back to simple dense search on field '{fields_to_search[0]}'.")
+            try:
+                first_dense_field = f"{fields_to_search[0]}_dense_embedding"
+                fallback_results = self.collection.search(
+                    data=[query_dense_embedding],
+                    anns_field=first_dense_field,
+                    param=dense_params,
+                    limit=limit,
+                    output_fields=output_fields,
+                )
+                formatted_results = []
+                if fallback_results:
+                    for hit in fallback_results[0]:
+                        entity_data = {"score": hit.score}
+                        for field in output_fields:
+                            entity_data[field] = hit.entity.get(field)
+                        formatted_results.append(entity_data)
+                return formatted_results
+            except Exception as fallback_e:
+                print(f"Fallback search also failed: {fallback_e}")
+                traceback.print_exc()
+                return []
