@@ -7,6 +7,11 @@ Tạo một customer service bot cho trường đại học để trả lời c�
 
 ### Implementation
 
+### How to run this python file
+```
+chainlit run customer_service_bot.py
+```
+
 ```python
 # customer_service_bot.py
 import os
@@ -95,11 +100,6 @@ async def main(message: cl.Message):
             subject="Chatbot Error",
             body=f"Error occurred: {str(e)}\nUser message: {message.content}"
         ))
-
-if __name__ == "__main__":
-    import chainlit as cl
-    cl.run()
-```
 
 ### Usage Examples
 
