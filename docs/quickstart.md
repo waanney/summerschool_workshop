@@ -401,27 +401,3 @@ uvicorn app:app --host 0.0.0.0 --port 8000
 # Hoặc với chainlit
 chainlit run app.py --host 0.0.0.0 --port 8000
 ```
-
-### 2. Docker deployment
-
-```dockerfile
-# Dockerfile
-FROM python:3.12-slim
-
-WORKDIR /app
-COPY . .
-
-RUN pip install .
-
-EXPOSE 8000
-
-CMD ["chainlit", "run", "app.py", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-```bash
-# Build và run
-docker build -t my-agent .
-docker run -p 8000:8000 my-agent
-```
-
-Với những ví dụ này, bạn có thể nhanh chóng bắt đầu sử dụng hệ thống và tùy chỉnh theo nhu cầu cụ thể của mình!

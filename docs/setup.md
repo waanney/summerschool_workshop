@@ -59,14 +59,6 @@ sudo apt-get install redis-server
 ```
 
 ### 5. Cài đặt Milvus
-
-#### Docker (Khuyến nghị)
-```bash
-# Tải và chạy Milvus Standalone
-wget https://github.com/milvus-io/milvus/releases/download/v2.4.0/milvus-standalone-docker-compose.yml -O docker-compose.yml
-docker-compose up -d
-```
-
 #### Milvus Cloud
 1. Truy cập [Milvus Cloud](https://cloud.milvus.io/)
 2. Tạo tài khoản và cluster
@@ -147,27 +139,11 @@ python -c "from src.data.cache.redis_cache import ShortTermMemory; sm = ShortTer
 # Khởi động Redis server
 redis-server
 ```
-
-#### Milvus connection timeout
-```bash
-# Kiểm tra Docker containers
-docker ps
-docker-compose logs milvus-standalone
-```
-
 #### Import errors
 ```bash
 # Cài đặt lại dependencies
 pip install --force-reinstall .
 ```
-
-#### Permission denied với Docker
-```bash
-# Thêm user vào Docker group (Linux)
-sudo usermod -aG docker $USER
-# Restart terminal
-```
-
 ### Debugging
 
 #### Bật debug mode
@@ -180,10 +156,6 @@ logging.basicConfig(level=logging.DEBUG)
 ```bash
 # Xem Redis logs
 redis-cli monitor
-
-# Xem Milvus logs
-docker-compose logs -f milvus-standalone
-```
 
 ## Cấu hình nâng cao
 
