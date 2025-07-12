@@ -31,6 +31,13 @@ agent = AgentClient(
     tools=[faq_tool] # Replace with your tools if any, e.g., [faq_tool]
 ).create_agent()
 
+@cl.on_chat_start
+async def start():
+    """Initialize chat session"""
+    cl.user_session.set("message_count", 0)
+    await cl.Message(content="🎓 **Chào mừng đến với Hệ thống hỗ trợ truy vấn NHÂN SỰ !**").send()
+    
+
 @cl.on_message
 async def main(message: cl.Message):    
     # YOUR LOGIC HERE
