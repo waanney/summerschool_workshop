@@ -3,30 +3,29 @@
 Tool search_tool cung cấp chức năng tìm kiếm tài liệu dựa trên truy vấn của người dùng, trả về các đoạn văn bản có liên quan. Tool này được xây dựng để tích hợp dễ dàng với PydanticAI Agent.
 🧩 Cấu trúc file
 
-Dự án được tổ chức theo cấu trúc sau:
-
-your_project/
-├── tools/
-│   └── search_tool.py  # Chứa định nghĩa của search_tool
-└── main.py             # File chính để chạy agent
-
-⚙️ Cài đặt
-
-    Tạo file requirements.txt với nội dung sau:
-
-    pydantic-ai
-    pydantic
-
-    Cài đặt các thư viện cần thiết bằng lệnh:
-
-    pip install -r requirements.txt
 
 🚀 Cách sử dụng
+---
 
-Để thực thi agent và sử dụng search_tool, bạn chỉ cần chạy file main.py.
+## ⚙️ Cài đặt
 
-Nội dung tools/search_tool.py:
+1. Tạo file `requirements.txt` với nội dung:
+    ```
+    pydantic-ai
+    pydantic
+    ```
+2. Cài đặt các thư viện cần thiết:
+    ```
+    pip install -r requirements.txt
+    ```
 
+---
+
+## 🚀 Hướng dẫn sử dụng
+
+### Nội dung `tools/search_tool.py`
+
+```python
 from typing import List
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, RunContext
@@ -59,21 +58,8 @@ def search_tool(ctx: RunContext[str], inp: SearchInput) -> SearchOutput:
     """
     return SearchOutput(docs=do_search(inp.query, inp.k))
 
-Nội dung main.py:
+```
 
-from tools.search_tool import agent as search_agent
-
-if __name__ == "__main__":
-    # Agent sẽ tự động hiểu yêu cầu, gọi tool `search_tool`
-    # và validate dữ liệu vào/ra.
-    resp = search_agent.run_sync("Tìm tài liệu về AI")
-    print(resp.output.docs)
-
-Chạy ứng dụng:
-
-python main.py
-
-Kết quả mong đợi:
 
 ["Tài liệu liên quan đến 'Tìm tài liệu về AI' #1", "Tài liệu liên quan đến 'Tìm tài liệu về AI' #2", "Tài liệu liên quan đến 'Tìm tài liệu về AI' #3"]
 
