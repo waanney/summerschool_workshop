@@ -20,6 +20,9 @@ pip install "pydantic-ai-slim[mcp]"
 pip install pydantic-ai
 ```
 
+
+## Các loại MCP Tools có sẵn 
+https://github.com/modelcontextprotocol/servers?tab=readme-ov-file
 ## Các loại MCP Client
 
 PydanticAI hỗ trợ 3 loại transport để kết nối với MCP server:
