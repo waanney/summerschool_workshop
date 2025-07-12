@@ -31,7 +31,7 @@ def normalize(text: str) -> str:
 
 def search_in_file(
     input: SearchInput,
-    file_path: str = "src/data/mock_data/admission_faq_large.csv"
+    file_path: str = "workflow/_data/output.csv"
 ) -> SearchOutput:
     """
     Search FAQ CSV file using both substring and fuzzy matching.
@@ -79,7 +79,7 @@ def search_in_file(
 
 
 def create_search_in_file_tool(
-    file_path: str = "src/data/mock_data/admission_faq_large.csv",
+    file_path: str = "workflow/_data/output.csv",
 ):
     """
     Create a search tool function with a pre-configured file path.
