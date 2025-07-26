@@ -1,7 +1,7 @@
 import csv
 import unicodedata
 from rapidfuzz import fuzz
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Callable
 from pydantic import BaseModel, Field
 
 
@@ -13,7 +13,8 @@ class SearchInput(BaseModel):
 
 class SearchOutput(BaseModel):
     results: List[Dict[str, Any]] = Field(
-        ..., description="Search results containing questions, answers, and relevance scores"
+        ...,
+        description="Search results containing questions, answers, and relevance scores",
     )
 
 
@@ -30,8 +31,7 @@ def normalize(text: str) -> str:
 
 
 def search_in_file(
-    input: SearchInput,
-    file_path: str = "workflow/_data/output.csv"
+    input: SearchInput, file_path: str = "workflow/_data/output.csv"
 ) -> SearchOutput:
     """
     Search FAQ CSV file using both substring and fuzzy matching.
@@ -64,11 +64,13 @@ def search_in_file(
 
             # Check substring match OR fuzzy above threshold
             if q_norm in q_text or q_norm in a_text or best_score >= input.threshold:
-                results.append({
-                    "Question": question,
-                    "Answer": answer,
-                    "score": best_score,
-                })
+                results.append(
+                    {
+                        "Question": question,
+                        "Answer": answer,
+                        "score": best_score,
+                    }
+                )
 
     # Sort by descending relevance
     results.sort(key=lambda x: x["score"], reverse=True)
@@ -80,7 +82,7 @@ def search_in_file(
 
 def create_search_in_file_tool(
     file_path: str = "workflow/_data/output.csv",
-):
+) -> Callable[[SearchInput], SearchOutput]:
     """
     Create a search tool function with a pre-configured file path.
 

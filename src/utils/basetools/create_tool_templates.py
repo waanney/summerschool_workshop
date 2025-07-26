@@ -1,6 +1,6 @@
-##*********************
-##1. Import các thư viện
-##*********************
+# *********************
+# 1. Import libraries and modules
+# *********************
 
 # from typing import List
 # from pydantic import BaseModel, Field
@@ -8,15 +8,14 @@
 # from data.milvus.milvus_client import MilvusClient
 
 
-##***********************
-##2. gọi các hàm nếu cần*
-##***********************
+# ***********************
+# 2. Call functions if needed
+# ***********************
 
 # embedding_engine = EmbeddingEngine()
-
-##*********************
-##3. config input     *
-##*********************
+# *********************
+# 3. config input     *
+# *********************
 
 # class SearchRelevantDocumentInput(BaseModel):
 #     user_query: str = Field(..., description="The user's query to search for relevant documents.")
@@ -24,16 +23,16 @@
 #     threshold: float = Field(0.7, description="The minimum similarity score for a document to be considered relevant.")
 #     collection_name: str = Field("summerschool_workshop", description="The name of the Milvus collection to search in.")
 
-##*********************
-##4. config output    *
-##*********************
+# *********************
+# 4. config output    *
+# *********************
 
 # class SearchRelevantDocumentOutput(BaseModel):
 #     documents: List[str] = Field(..., description="A list of relevant document chunks retrieved from the vector database.")
 
-##**********************
-##5. Function tạo tools*
-##**********************
+# **********************
+# 5. Function create tools*
+# **********************
 
 # def search_relevant_document(input: SearchRelevantDocumentInput) -> SearchRelevantDocumentOutput:
 #     """
@@ -43,18 +42,18 @@
 #     matches a query to a pre-defined question and returns its corresponding pre-written answer.
 #     """
 #     client = MilvusClient(collection_name=input.collection_name)
-#     
+#
 #     query_embedding = embedding_engine.get_query_embedding(input.user_query)
-#     
+#
 #     search_results = client.generic_hybrid_search(
 #         query_dense_embedding=query_embedding,
 #         limit=input.k,
 #         query_text=input.user_query
 #     )
-#     
+#
 #     relevant_documents = []
 #     for result in search_results:
 #         if result.get('score', 0.0) >= input.threshold:
 #             relevant_documents.append(result.get('text', ''))
-#             
+#
 #     return SearchRelevantDocumentOutput(documents=relevant_documents)

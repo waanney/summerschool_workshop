@@ -13,6 +13,14 @@ class SearchOutput(BaseModel):
 
 
 def search_web(input: SearchInput) -> SearchOutput:
+    """Search the web for a query and return the results.
+
+    Args:
+        input (SearchInput): The input parameters for the search.
+
+    Returns:
+        SearchOutput: The output containing the search results.
+    """
     url = "https://duckduckgo.com/html/"
     params = {"q": input.query}
     headers = {"User-Agent": "Mozilla/5.0"}

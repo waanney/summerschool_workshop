@@ -4,11 +4,11 @@ from llm.base import AgentClient
 from pydantic_ai.models.gemini import GeminiModel
 from pydantic_ai.providers.google_gla import GoogleGLAProvider
 
-from data.cache.memory_handler import MessageMemoryHandler
-
 import chainlit as cl
 
-from utils.basetools import *
+from utils.basetools.faq_tool import create_faq_tool
+from utils.basetools.send_email_tool import send_email_tool, EmailToolInput
+from data.prompts.mini_qa_agent_prompt import SYSTEM_PROMPT
 
 # Initialize Milvus indexer (run only once to create collection and index data)
 # Comment this out after first run
@@ -19,27 +19,28 @@ indexer.run()
 provider = GoogleGLAProvider(api_key=os.getenv("GEMINI_API_KEY"))
 model = GeminiModel('gemini-2.0-flash', provider=provider)
 
-# Initialize your tool 
-#---------------------------------------------
+# Initialize your tools
+# ---------------------------------------------
 faq_tool = create_faq_tool(collection_name="company1")
-#---------------------------------------------
+# ---------------------------------------------
 
 # Initialize agent with tools
 agent = AgentClient(
     model=model,
-    system_prompt="You are an intelligent virtual assistant. Please use `faq_tool` to search user question and answer.",  # Replace with your system prompt
-    tools=[faq_tool] # Replace with your tools if any, e.g., [faq_tool]
+    system_prompt=SYSTEM_PROMPT,
+    tools=[faq_tool]
 ).create_agent()
+
 
 @cl.on_chat_start
 async def start():
     """Initialize chat session"""
     cl.user_session.set("message_count", 0)
-    await cl.Message(content="🎓 **Chào mừng đến với Hệ thống hỗ trợ truy vấn NHÂN SỰ !**").send()
-    
+    await cl.Message(content="🎓 **Welcome to the HR Query Support System!**").send()
+
 
 @cl.on_message
-async def main(message: cl.Message):    
+async def main(message: cl.Message):
     # YOUR LOGIC HERE
     response = await agent.run((message.content))
     await cl.Message(content=str(response.output)).send()

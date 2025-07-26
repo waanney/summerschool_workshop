@@ -41,7 +41,7 @@ class HttpRequest(BaseModel):
 
     def model_post_init(self, __context):
         """
-        Nếu body_type == RAW, mà body là dict ⇒ chuyển sang chuỗi JSON.
+        Post-initialization hook to ensure the body is serialized correctly based on its type.
         """
         if self.body_type == BodyType.RAW and isinstance(self.body, dict):
             object.__setattr__(

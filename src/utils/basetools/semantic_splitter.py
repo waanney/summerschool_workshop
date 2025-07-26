@@ -9,10 +9,13 @@ import spacy
 from sentence_transformers import SentenceTransformer
 
 from pathlib import Path
-import docx2txt, PyPDF2
+import docx2txt
+import PyPDF2
+
 
 def load_txt(path: str | Path) -> str:
     return Path(path).read_text(encoding="utf-8")
+
 
 def load_pdf(path: str | Path) -> str:
     text = ""
@@ -21,8 +24,10 @@ def load_pdf(path: str | Path) -> str:
             text += page.extract_text() or ""
     return text
 
+
 def load_docx(path: str | Path) -> str:
-    return docx2txt.process(str(path))
+    result = docx2txt.process(str(path))
+    return result if isinstance(result, str) else ""
 
 @dataclass
 class SemanticSplitter:
@@ -43,7 +48,9 @@ class SemanticSplitter:
                 "sentencizer", config={"punct_chars": [".", "!", "?", "…"]}
             )
             if self.model_name == "sentence-transformers/all-MiniLM-L6-v2":
-                self.model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+                self.model_name = (
+                    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+                )
         else:
             self._nlp = spacy.blank("en")
             self._nlp.add_pipe("sentencizer")
@@ -68,11 +75,9 @@ class SemanticSplitter:
                 chunks[-1].append(sent)
                 counts[-1] += tokens
             else:
-                overlap_sents = chunks[-1][-self.overlap :] if self.overlap else []
+                overlap_sents = chunks[-1][-self.overlap:] if self.overlap else []
                 chunks.append(overlap_sents + [sent])
-                counts.append(
-                    sum(map(self._estimate_tokens, overlap_sents)) + tokens
-                )
+                counts.append(sum(map(self._estimate_tokens, overlap_sents)) + tokens)
 
         return [" ".join(c).strip() for c in chunks if c]
 
@@ -84,10 +89,10 @@ class SemanticSplitter:
         return [s.text.strip() for s in self._nlp(text.strip()).sents if s.text.strip()]
 
     def _embeddings(self, sents: Sequence[str]) -> np.ndarray:
-        return self._model.encode(sents, convert_to_numpy=True, normalize_embeddings=True)
+        return self._model.encode(sents, convert_to_numpy=True, normalize_embeddings=True)  # type: ignore
 
     @staticmethod
     def _pairwise_similarities(embeds: np.ndarray) -> np.ndarray:
         if embeds.shape[0] < 2:
-            return np.array([])
+            return np.array([], dtype=np.float32)
         return np.sum(embeds[:-1] * embeds[1:], axis=1)

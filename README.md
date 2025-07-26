@@ -1,6 +1,6 @@
 # summerschool_workshop
 
-A private Python-based project for experimenting with advanced data retrieval and conversational AI workflows. The repository focuses on integrating semantic search, vector databases, memory caching, and large language models (LLMs) for question-answering and agent-driven interaction.
+A Python-based project for experimenting with advanced data retrieval and conversational AI workflows. The repository focuses on integrating semantic search, vector databases, memory caching, and large language models (LLMs) for question-answering and agent-driven interaction.
 
 ## Features
 
@@ -27,19 +27,24 @@ A private Python-based project for experimenting with advanced data retrieval an
    cd summerschool_workshop
    ```
 
-2. **Install dependencies**  
+2. **Create Environment**
+```
+  
+```
+
+3. **Install dependencies**  
    Recommended to use a virtual environment.
    ```
    pip install .  
    ```
 
-3. **Environment Variables**  
+4. **Environment Variables**  
    Set the following environment variables as needed:
    - `GEMINI_API_KEY` (for Google Gemini)
    - `MILVUS_URI`, `MILVUS_TOKEN` (for Milvus vector DB)
    - Redis connection details (if not default)
 
-4. **Run a Demo**  
+5. **Run a Demo**  
    To start the conversational demo (requires Chainlit):
    ```
    chainlit run workflow/demo_with_memory.py

@@ -30,12 +30,12 @@ class MessageMemoryHandler:
 
         return full_message
 
-    def store_bot_response(self, response: str):
+    def store_bot_response(self, response: str) -> None:
         """Store bot response to memory"""
         session_key = self.session_manager.get_session_key()
         self.session_manager.store_bot_message(session_key, response)
 
-    def store_error(self, error: Exception):
+    def store_error(self, error: Exception) -> None:
         """Store error to memory"""
         session_key = self.session_manager.get_session_key()
-        self.session_manager.store_error_message(session_key, error)
+        self.session_manager.store_error_message(session_key, str(error))

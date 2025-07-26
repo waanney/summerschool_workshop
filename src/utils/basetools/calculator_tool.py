@@ -1,12 +1,6 @@
-"""
-Calculator Tool for mathematical operations
-Supports basic arithmetic, scientific functions, and complex expressions
-Designed for use with AI agents and includes Pydantic models for structured input/output
-"""
-
 import math
 import re
-from typing import Union,Optional
+from typing import Union, Optional
 from decimal import getcontext
 import ast
 import operator
@@ -110,12 +104,9 @@ class MemoryOperation(BaseModel):
 
 
 class CalculatorTool:
-    """A comprehensive calculator tool with support for various mathematical operations."""
 
-    # Set precision for decimal calculations
     getcontext().prec = 28
 
-    # Safe operators for eval
     SAFE_OPERATORS = {
         ast.Add: operator.add,
         ast.Sub: operator.sub,
@@ -196,7 +187,7 @@ class CalculatorTool:
         """Raise base to the power of exponent."""
         result = base**exponent
         self._add_to_history(f"{base}^{exponent} = {result}")
-        return result
+        return float(result)
 
     def square_root(self, number: float) -> float:
         """Calculate square root of a number."""
@@ -619,12 +610,10 @@ class CalculatorTool:
             calc.calculate("sin(30)", degrees=True)  # Returns 0.5
         """
         try:
-            # Create input model for validation
             input_data = CalculationInput(
                 expression=expression, degrees=degrees, precision=precision
             )
 
-            # Use the validated calculation method
             output = self.calculate_with_validation(input_data)
 
             if output.success:
