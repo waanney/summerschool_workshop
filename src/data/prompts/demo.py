@@ -8,7 +8,7 @@ SYSTEM_PROMT = """
     - Use the "merge_files_tool" to merge them together
 
 2.**Perform Search**:
-    - use "faq_tool" and search query in vector database 
+    - use "faq_tool" and search query in vector database
 3.**Email Notification**:
     - After providing product information to the user, you MUST call send_email_tool to send a summary of the request and the results to the Product Manager at product_manager@example.com.
     IMPORTANT: **leave sender_email and sender_password blank—the system will auto-fill them. DO NOT supply sender_email or sender_password.**

@@ -1,18 +1,25 @@
-import redis
+from redis import Redis
 import uuid
 from datetime import datetime
 import chainlit as cl
+import redis
+from typing import List
 
 
 class ShortTermMemory:
     """Manages user sessions and conversation memory with Redis backend"""
 
-    def __init__(self, host="localhost", port=6379, db=0, max_messages=15):
-        # Initialize Redis client
-        self.redis_client = redis.StrictRedis(host=host, port=port, db=db)
-        self.max_messages = max_messages  # Maximum number of messages to store
+    def __init__(
+        self,
+        host: str = "localhost",
+        port: int = 6379,
+        db: int = 0,
+        max_messages: int = 15,
+    ):
+        self.redis_client: Redis = redis.StrictRedis(host=host, port=port, db=db)
+        self.max_messages = max_messages
 
-    def store(self, key: str, message: str):
+    def store(self, key: str, message: str) -> None:
         """Store a message in Redis, keeping only the latest 'max_messages' messages."""
         self.redis_client.lpush(key, message)
 
@@ -22,36 +29,33 @@ class ShortTermMemory:
             f"Stored message: {message} for key: {key}. Total messages: {self.redis_client.llen(key)}"
         )
 
-    def retrieve(self, key: str):
-        """Retrieve all messages from Redis for a session (key)."""
-        messages = self.redis_client.lrange(key, 0, -1)
+    def retrieve(self, key: str) -> List[str]:
+        messages = self.redis_client.lrange(key, 0, -1) or []
         return [
-            msg.decode("utf-8") for msg in messages
-        ]  # Decode each message from bytes
+            msg.decode("utf-8") if isinstance(msg, bytes) else msg for msg in messages  # type: ignore
+        ]
 
-    def delete(self, key: str):
+    def delete(self, key: str) -> None:
         """Delete all messages for a given key."""
         self.redis_client.delete(key)
         print(f"Deleted all messages for key: {key}")
 
-    def get_session_key(self):
+    def get_session_key(self) -> str:
         """Get or create session key"""
-        session_key = cl.user_session.get("session_key")
+        session_key = cl.user_session.get("session_key")  # type: ignore
         if not session_key:
             session_key = (
                 f"user_{str(uuid.uuid4())[:8]}_{datetime.now().strftime('%Y%m%d_%H%M')}"
             )
-            cl.user_session.set("session_key", session_key)
-        return session_key
+            cl.user_session.set("session_key", session_key)  # type: ignore
+        return str(session_key) if isinstance(session_key, str) else ""
 
-    def get_history_context(self, session_key):
+    def get_history_context(self, session_key: str) -> str:
         """Build conversation history context"""
         history = self.retrieve(session_key)
         if len(history) == 0:
             return ""
 
-        # Redis LPUSH puts newest first, so reverse to get chronological order
-        # Take up to 8 most recent messages in chronological order
         recent = list(reversed(history))[:8]
         context = "\n=== CONVERSATION HISTORY ===\n"
         if len(history) > 8:
@@ -59,62 +63,25 @@ class ShortTermMemory:
 
         return context + "\n".join(recent) + "\n=== END HISTORY ===\n\n"
 
-    def store_message(self, session_key, role, content):
+    def store_message(self, session_key: str, role: str, content: str) -> None:
         """Store a message with timestamp"""
         timestamp = datetime.now().strftime("%H:%M")
         self.store(session_key, f"[{timestamp}] {role}: {content}")
 
-    def store_user_message(self, session_key, content):
+    def store_user_message(self, session_key: str, content: str) -> None:
         """Store user message"""
         self.store_message(session_key, "User", content)
 
-    def store_bot_message(self, session_key, content):
+    def store_bot_message(self, session_key: str, content: str) -> None:
         """Store bot message"""
         self.store_message(session_key, "Bot", content)
 
-    def store_error_message(self, session_key, error):
+    def store_error_message(self, session_key: str, error: str) -> None:
         """Store error message"""
         self.store_message(session_key, "System", f"Error - {str(error)}")
 
-    def update_message_count(self):
+    def update_message_count(self) -> int:
         """Update and return message count"""
         count = (cl.user_session.get("message_count") or 0) + 1
         cl.user_session.set("message_count", count)
         return count
-
-
-def test_session_manager():
-    """Test function for SessionManager"""
-    # Create an instance of the SessionManager class with max 3 messages
-    manager = ShortTermMemory(max_messages=3)
-
-    session_key = "user_1234_session"  # The unique key for this user session
-
-    # Simulate storing some messages
-    print("Storing messages...")
-    manager.store(session_key, "Message 1: User asks about account balance.")
-    manager.store(session_key, "Message 2: User asks for recent transactions.")
-    manager.store(session_key, "Message 3: User asks for support contact info.")
-
-    # Retrieve the stored messages and print
-    print("Messages after storing 3:")
-    print(manager.retrieve(session_key))
-
-    # Simulate adding a 4th message (this should remove the oldest message)
-    print("Storing 4th message...")
-    manager.store(session_key, "Message 4: User asks for last month's bill.")
-
-    # Retrieve and print the messages after the 4th message is added
-    print("Messages after storing the 4th message (oldest removed):")
-    print(manager.retrieve(session_key))
-
-    # Clear all memory for the session
-    print("Clearing memory...")
-    manager.delete(session_key)
-    print(f"Memory for {session_key} after clearing:")
-    print(manager.retrieve(session_key))
-
-
-# Call the test function when run directly
-if __name__ == "__main__":
-    test_session_manager()

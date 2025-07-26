@@ -4,6 +4,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import List, Optional
 from pydantic import BaseModel, Field
+from typing import Callable
 
 
 class EmailToolInput(BaseModel):
@@ -36,8 +37,8 @@ def send_email_tool(
     """
     try:
         # Get sender credentials from input or environment variables
-        sender_email = sender_email  
-        sender_password = sender_password 
+        sender_email = sender_email
+        sender_password = sender_password
         smtp_server = "smtp.gmail.com"
         smtp_port = 587
 
@@ -75,7 +76,7 @@ def send_email_tool(
 
 def create_send_email_tool(
     to_emails: List[str], sender_email: Optional[str], sender_password: Optional[str]
-):
+) -> Callable[[EmailToolInput], EmailToolOutput]:
     """
     Create a send email tool function with pre-configured recipient emails.
 

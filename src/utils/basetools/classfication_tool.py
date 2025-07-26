@@ -12,9 +12,9 @@ load_dotenv()
 class SearchInput(BaseModel):
     query: str = Field(..., description="Search query")
 
+
 class SearchOutput(BaseModel):
     result: str = Field(..., description="Identifying the label")
-
 
 
 API_KEY: str | None = os.getenv("GEMINI_API_KEY")
@@ -25,7 +25,6 @@ ENDPOINT = (
     "https://generativelanguage.googleapis.com/v1beta"
     "/models/gemini-2.0-flash:generateContent"
 )
-
 
 
 def classify_scholarship_http(
@@ -39,13 +38,13 @@ def classify_scholarship_http(
     if not labels or len(set(labels)) < 2:
         raise ValueError("`labels` must contain at least two distinct strings.")
 
-    labels = [l.strip().lower() for l in labels]
-
+    labels = [label.strip().lower() for label in labels]
 
     system_prompt = (
         "You are a helpful AI assistant specialised in single‑label text classification.\n"
         "ONLY reply the exact text of **one** label from the following list (case‑insensitive): "
-        + ", ".join(labels) + "."
+        + ", ".join(labels)
+        + "."
     )
     user_prompt = f'Câu hỏi: "{inp.query}"'
 
@@ -57,7 +56,6 @@ def classify_scholarship_http(
         "generationConfig": {"temperature": 0.1},
     }
 
-
     resp = requests.post(
         ENDPOINT,
         params={"key": API_KEY},
@@ -66,7 +64,6 @@ def classify_scholarship_http(
     )
     resp.raise_for_status()
     data = resp.json()
-
 
     try:
         reply_text: str = (
@@ -77,8 +74,7 @@ def classify_scholarship_http(
     except (KeyError, IndexError):
         raise RuntimeError(f"Unexpected Gemini response: {json.dumps(data)[:200]}…")
 
-
     if reply_text not in labels:
-        reply_text = "không thể xác định"
+        reply_text = "Undefined"
 
     return SearchOutput(result=reply_text)

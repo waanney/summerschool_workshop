@@ -8,11 +8,11 @@ from pymilvus import (
     utility,
 )
 from data.embeddings.embedding_engine import EmbeddingEngine
-import json
 import csv
 from data.milvus.milvus_client import MilvusClient
 import logging
 import pandas as pd
+from typing import List, Dict, Tuple
 
 # Setup logger
 logging.basicConfig(level=logging.INFO)
@@ -31,11 +31,11 @@ class MilvusIndexer:
         self.milvus_client = MilvusClient()
         self.collection = None
 
-    def connect(self):
+    def connect(self) -> None:
         """Connect to the Milvus server."""
         self.milvus_client._connect()
 
-    def create_collection(self, data_sample=None):
+    def create_collection(self, data_sample=None) -> None:
         """Create a Milvus collection with dynamic schema based on data columns."""
         if data_sample is None:
             loader = (
@@ -113,7 +113,7 @@ class MilvusIndexer:
             f"Created collection '{self.collection_name}' with categories: {categories}"
         )
 
-    def load_faq_data_from_csv(self):
+    def load_faq_data_from_csv(self) -> List[Dict[str, str]]:
         """Load FAQ data from the CSV file."""
         with open(self.faq_file, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
@@ -125,17 +125,17 @@ class MilvusIndexer:
         logger.info(f"Loaded {len(data)} entries from {self.faq_file}.")
         return data
 
-    def load_faq_data_from_xlsx(self):
+    def load_faq_data_from_xlsx(self) -> List[Dict[str, str]]:
         """Load FAQ data from the XLSX file with many sheets."""
         data = []
         for engine in ["openpyxl", "xlrd", "calamine"]:
             try:
-                xls = pd.ExcelFile(self.faq_file, engine=engine)   # type: ignore
+                xls = pd.ExcelFile(self.faq_file, engine=engine)  # type: ignore
                 for sheet_name in xls.sheet_names:
                     df = pd.read_excel(xls, sheet_name=sheet_name)
                     for _, row in df.iterrows():
                         row_data = {
-                            k: v
+                            str(k): str(v)
                             for k, v in row.items()
                             if pd.notna(v) and str(v).strip()
                         }
@@ -147,10 +147,12 @@ class MilvusIndexer:
                 continue
         raise Exception(f"Could not open Excel file {self.faq_file}")
 
-    def generate_embeddings(self, data):
+    def generate_embeddings(
+        self, data
+    ) -> Tuple[Dict[str, List[str]], Dict[str, List[List[float]]]]:
         """Generate dense embeddings for all categories dynamically."""
         if not data:
-            return [], []
+            return {}, {}
 
         categories = list(data[0].keys())
         embedding_engine = EmbeddingEngine(model_name="all-MiniLM-L6-v2")
@@ -167,45 +169,45 @@ class MilvusIndexer:
 
         return category_texts, category_embeddings
 
-    def insert_data(self, data):
+    def insert_data(self, data) -> None:
         """Insert data into the Milvus collection."""
         if self.collection is None:
             raise Exception(
                 "Collection is not created. Call create_collection() first."
             )
-
         category_texts, category_embeddings = self.generate_embeddings(data)
 
         if isinstance(category_texts, dict):
             categories = list(category_texts.keys())
             print(categories)
-            
-            entities = []
-            
-            for category in categories:
-                entities.append(category_texts[category]) 
-                entities.append(category_embeddings[category])  
 
+            texts = [text for category in categories for text in category_texts[category]]
+            embeddings = [vec for category in categories for vec in category_embeddings[category]]
+
+            entities = [texts, embeddings]
         else:
+            categories = []
             entities = [category_texts, category_embeddings]
 
         logger.info(
             f"Inserting {len(data)} entries into collection '{self.collection_name}'"
         )
-        logger.info(f"Categories: {categories}")
+        logger.info(f"Categories: {str(categories)}")
         logger.info(f"Entity arrays: {len(entities)}")
         for i, entity in enumerate(entities):
+            if isinstance(entity, (list, tuple)) and entity:
+                entity_type = type(entity[0])
+            else:
+                entity_type = type(entity)
             logger.info(
-                f"Entity {i}: {type(entity[0]) if entity else 'empty'} - length {len(entity)}"
-            )
+                f"Entity {i}: {entity_type if entity else 'empty'}")
 
         insert_result = self.collection.insert(entities)
         self.collection.flush()
-
         logger.info(f"Successfully inserted {len(data)} records")
-        return insert_result
+        logger.info(f"Insert result: {insert_result}")
 
-    def create_index(self, categories=None):
+    def create_index(self, categories=None) -> None:
         """Create indexes for dense and sparse embeddings dynamically."""
         if self.collection is None:
             raise Exception(
@@ -251,7 +253,7 @@ class MilvusIndexer:
             f"All indexes created and collection loaded for categories: {categories}"
         )
 
-    def run(self):
+    def run(self) -> None:
         """Run the indexing process."""
         self.connect()
         loader = (
