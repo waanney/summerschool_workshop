@@ -9,6 +9,8 @@ import chainlit as cl
 from utils.basetools.faq_tool import create_faq_tool
 from utils.basetools.send_email_tool import send_email_tool, EmailToolInput
 from data.prompts.mini_qa_agent_prompt import SYSTEM_PROMPT
+from data.cache.memory_handler import MessageMemoryHandler
+
 
 # Initialize Milvus indexer (run only once to create collection and index data)
 # Comment this out after first run
@@ -31,6 +33,7 @@ agent = AgentClient(
     tools=[faq_tool]
 ).create_agent()
 
+memory_handler = MessageMemoryHandler()
 
 @cl.on_chat_start
 async def start():
@@ -42,7 +45,10 @@ async def start():
 @cl.on_message
 async def main(message: cl.Message):
     # YOUR LOGIC HERE
-    response = await agent.run((message.content))
+    message_with_history = memory_handler.get_history_message(message.content)
+    response = await agent.run((message_with_history))
+    memory_handler.store_bot_response(response.output)
+    
     await cl.Message(content=str(response.output)).send()
 
     send_email_tool(
