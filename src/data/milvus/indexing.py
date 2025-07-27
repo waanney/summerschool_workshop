@@ -7,7 +7,7 @@ from pymilvus import (
     FunctionType,
     utility,
 )
-from data.embeddings.embedding_engine import EmbeddingEngine
+from data.embeddings.embedding_engine import EmbeddingEngine, EmbeddingModel
 import csv
 from data.milvus.milvus_client import MilvusClient
 import logging
@@ -155,7 +155,7 @@ class MilvusIndexer:
             return {}, {}
 
         categories = list(data[0].keys())
-        embedding_engine = EmbeddingEngine(model_name="all-MiniLM-L6-v2")
+        embedding_engine = EmbeddingEngine(model_name=EmbeddingModel.MINI_LM_L6_V2)
 
         category_texts = {}
         category_embeddings = {}
@@ -181,10 +181,13 @@ class MilvusIndexer:
             categories = list(category_texts.keys())
             print(categories)
 
-            texts = [text for category in categories for text in category_texts[category]]
-            embeddings = [vec for category in categories for vec in category_embeddings[category]]
-
-            entities = [texts, embeddings]
+            # Create separate lists for each field
+            entities = []
+            for category in categories:
+                # Add text data
+                entities.append(category_texts[category])
+                # Add dense embeddings
+                entities.append(category_embeddings[category])
         else:
             categories = []
             entities = [category_texts, category_embeddings]
@@ -248,7 +251,7 @@ class MilvusIndexer:
                 index_params=sparse_index_params,
             )
 
-        self.collection.load()
+        self.collection.load(replica_number=1)
         logger.info(
             f"All indexes created and collection loaded for categories: {categories}"
         )

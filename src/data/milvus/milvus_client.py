@@ -209,7 +209,7 @@ class MilvusClient:
 
         try:
             # Load collection into memory
-            self.collection.load()
+            self.collection.load(replica_number=1)
             print("Collection loaded successfully")
         except Exception as e:
             print(f"Error loading collection: {str(e)}")
@@ -343,7 +343,7 @@ class MilvusClient:
         """
         self._ensure_connection()
         try:
-            self.collection.load()
+            self.collection.load(replica_number=1)
         except Exception as e:
             print(f"Error loading collection: {e}")
             return []
