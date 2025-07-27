@@ -69,8 +69,12 @@ class BasicOperationOutput(BaseModel):
     result: Union[float, int] = Field(..., description="The calculated result")
     expression: str = Field(..., description="The mathematical expression")
     operation: str = Field(..., description="The operation performed")
-    success: bool = Field(default=True, description="Whether the calculation was successful")
-    error_message: Optional[str] = Field(default=None, description="Error message if calculation failed")
+    success: bool = Field(
+        default=True, description="Whether the calculation was successful"
+    )
+    error_message: Optional[str] = Field(
+        default=None, description="Error message if calculation failed"
+    )
 
 
 class TrigonometricInput(BaseModel):
@@ -91,8 +95,12 @@ class TrigonometricOutput(BaseModel):
     function: str = Field(..., description="The trigonometric function used")
     angle: float = Field(..., description="The input angle")
     degrees: bool = Field(..., description="Whether angle was in degrees")
-    success: bool = Field(default=True, description="Whether the calculation was successful")
-    error_message: Optional[str] = Field(default=None, description="Error message if calculation failed")
+    success: bool = Field(
+        default=True, description="Whether the calculation was successful"
+    )
+    error_message: Optional[str] = Field(
+        default=None, description="Error message if calculation failed"
+    )
 
 
 class LogarithmInput(BaseModel):
@@ -121,8 +129,12 @@ class LogarithmOutput(BaseModel):
     expression: str = Field(..., description="The logarithmic expression")
     number: float = Field(..., description="The input number")
     base: float = Field(..., description="The logarithm base")
-    success: bool = Field(default=True, description="Whether the calculation was successful")
-    error_message: Optional[str] = Field(default=None, description="Error message if calculation failed")
+    success: bool = Field(
+        default=True, description="Whether the calculation was successful"
+    )
+    error_message: Optional[str] = Field(
+        default=None, description="Error message if calculation failed"
+    )
 
 
 class MemoryOperation(BaseModel):
@@ -141,9 +153,15 @@ class MemoryOutput(BaseModel):
 
     operation: str = Field(..., description="The memory operation performed")
     memory_value: float = Field(..., description="Current value in memory")
-    result: Optional[Union[float, str]] = Field(default=None, description="Result of the operation")
-    success: bool = Field(default=True, description="Whether the operation was successful")
-    error_message: Optional[str] = Field(default=None, description="Error message if operation failed")
+    result: Optional[Union[float, str]] = Field(
+        default=None, description="Result of the operation"
+    )
+    success: bool = Field(
+        default=True, description="Whether the operation was successful"
+    )
+    error_message: Optional[str] = Field(
+        default=None, description="Error message if operation failed"
+    )
 
 
 class HistoryOutput(BaseModel):
@@ -151,7 +169,9 @@ class HistoryOutput(BaseModel):
 
     history: List[str] = Field(..., description="List of calculation history entries")
     count: int = Field(..., description="Number of history entries")
-    success: bool = Field(default=True, description="Whether the operation was successful")
+    success: bool = Field(
+        default=True, description="Whether the operation was successful"
+    )
 
 
 class CalculatorTool:
@@ -804,7 +824,7 @@ def trigonometry(input_data: TrigonometricInput) -> TrigonometricOutput:
         trigonometry(30, "sin", True) -> TrigonometricOutput with result 0.5
         trigonometry(1.57, "cos", False) -> TrigonometricOutput with result 0.0007963
     """
-    try:   
+    try:
         result = _calculator_instance.trigonometric_operation(input_data)
 
         if result.success:

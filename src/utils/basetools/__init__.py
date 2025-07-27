@@ -27,7 +27,7 @@ Key Features:
 
 Usage:
     from src.utils.basetools import classification_tool, faq_tool, http_tool
-    
+
     # Use tools with proper input models
     result = classification_tool(SearchInput(query="text"), labels=["label1", "label2"])
 """

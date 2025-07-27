@@ -23,4 +23,6 @@ from . import mock_data
 
 __version__ = "1.0.0"
 __author__ = "Summerschool Workshop Team"
-__description__ = "Data management and processing package for the summerschool workshop project"
+__description__ = (
+    "Data management and processing package for the summerschool workshop project"
+)

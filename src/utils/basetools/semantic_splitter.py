@@ -23,6 +23,7 @@ import PyPDF2
 
 class Language(str, Enum):
     """Enum for supported languages."""
+
     VIETNAMESE = "vi"
     ENGLISH = "en"
     MULTILINGUAL = "multi"
@@ -30,6 +31,7 @@ class Language(str, Enum):
 
 class FileType(str, Enum):
     """Enum for supported file types."""
+
     TXT = "txt"
     PDF = "pdf"
     DOCX = "docx"
@@ -38,13 +40,13 @@ class FileType(str, Enum):
 def load_txt(path: str | Path) -> str:
     """
     Load text content from a .txt file.
-    
+
     Args:
         path: Path to the text file
-        
+
     Returns:
         str: Content of the text file
-        
+
     Raises:
         FileNotFoundError: If the file doesn't exist
         UnicodeDecodeError: If the file encoding is not UTF-8
@@ -55,13 +57,13 @@ def load_txt(path: str | Path) -> str:
 def load_pdf(path: str | Path) -> str:
     """
     Load text content from a .pdf file.
-    
+
     Args:
         path: Path to the PDF file
-        
+
     Returns:
         str: Extracted text content from all pages
-        
+
     Raises:
         FileNotFoundError: If the file doesn't exist
         PyPDF2.PdfReadError: If the PDF is corrupted or unreadable
@@ -76,13 +78,13 @@ def load_pdf(path: str | Path) -> str:
 def load_docx(path: str | Path) -> str:
     """
     Load text content from a .docx file.
-    
+
     Args:
         path: Path to the DOCX file
-        
+
     Returns:
         str: Extracted text content from the document
-        
+
     Raises:
         FileNotFoundError: If the file doesn't exist
         docx2txt.Docx2txtError: If the DOCX file is corrupted
@@ -95,12 +97,12 @@ def load_docx(path: str | Path) -> str:
 class SemanticSplitter:
     """
     Semantic text splitter for creating coherent text chunks.
-    
+
     This class splits text into semantically meaningful chunks based on sentence
     similarity and token limits. It uses sentence transformers for embedding
     and spaCy for sentence tokenization.
     """
-    
+
     model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     language: Language = Language.MULTILINGUAL
     max_tokens: int = 200
@@ -141,19 +143,19 @@ class SemanticSplitter:
     def split(self, text: str) -> List[str]:
         """
         Split text into semantically coherent chunks.
-        
+
         Args:
             text: Input text to be split
-            
+
         Returns:
             List[str]: List of text chunks
-            
+
         Raises:
             ValueError: If text is empty or None
         """
         if not text or not text.strip():
             return []
-            
+
         sentences: List[str] = self._sentences(text)
         if not sentences:
             return []
@@ -171,7 +173,9 @@ class SemanticSplitter:
                 chunks[-1].append(sent)
                 counts[-1] += tokens
             else:
-                overlap_sents: List[str] = chunks[-1][-self.overlap:] if self.overlap else []
+                overlap_sents: List[str] = (
+                    chunks[-1][-self.overlap :] if self.overlap else []
+                )
                 chunks.append(overlap_sents + [sent])
                 counts.append(sum(map(self._estimate_tokens, overlap_sents)) + tokens)
 
@@ -181,10 +185,10 @@ class SemanticSplitter:
     def _estimate_tokens(text: str) -> int:
         """
         Estimate the number of tokens in a text string.
-        
+
         Args:
             text: Text to estimate tokens for
-            
+
         Returns:
             int: Estimated number of tokens
         """
@@ -193,10 +197,10 @@ class SemanticSplitter:
     def _sentences(self, text: str) -> List[str]:
         """
         Extract sentences from text using spaCy.
-        
+
         Args:
             text: Text to extract sentences from
-            
+
         Returns:
             List[str]: List of sentence strings
         """
@@ -205,10 +209,10 @@ class SemanticSplitter:
     def _embeddings(self, sents: Sequence[str]) -> np.ndarray:
         """
         Generate embeddings for a sequence of sentences.
-        
+
         Args:
             sents: Sequence of sentence strings
-            
+
         Returns:
             np.ndarray: Array of sentence embeddings
         """
@@ -218,10 +222,10 @@ class SemanticSplitter:
     def _pairwise_similarities(embeds: np.ndarray) -> np.ndarray:
         """
         Calculate pairwise similarities between consecutive embeddings.
-        
+
         Args:
             embeds: Array of embeddings
-            
+
         Returns:
             np.ndarray: Array of similarity scores between consecutive embeddings
         """

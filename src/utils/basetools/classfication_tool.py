@@ -19,24 +19,32 @@ load_dotenv()
 
 class ClassificationMode(str, Enum):
     """Enum for classification modes."""
+
     SINGLE_LABEL = "single_label"
     MULTI_LABEL = "multi_label"
 
 
 class SearchInput(BaseModel):
     """Input model for text classification requests."""
+
     query: str = Field(..., description="Text query to be classified")
 
 
 class SearchOutput(BaseModel):
     """Output model for text classification results."""
+
     result: str = Field(..., description="The classified label")
-    confidence: float = Field(default=0.0, description="Confidence score of the classification")
-    mode: ClassificationMode = Field(default=ClassificationMode.SINGLE_LABEL, description="Classification mode used")
+    confidence: float = Field(
+        default=0.0, description="Confidence score of the classification"
+    )
+    mode: ClassificationMode = Field(
+        default=ClassificationMode.SINGLE_LABEL, description="Classification mode used"
+    )
 
 
 class GeminiResponseData(BaseModel):
     """Model for structured Gemini API response data."""
+
     candidates: List[Dict[str, Dict[str, List[Dict[str, str]]]]]
 
 
@@ -60,20 +68,20 @@ def classify_scholarship_http(
 ) -> SearchOutput:
     """
     Classify text using Gemini API with specified labels.
-    
+
     This function sends a text classification request to the Gemini API and returns
     the most appropriate label from the provided list. The function ensures strong
     typing and proper error handling.
-    
+
     Args:
         inp: SearchInput object containing the query text to classify
         labels: List of possible classification labels (must have at least 2 distinct labels)
         temperature: Controls randomness in the model's response (0.0 to 1.0)
         timeout: Request timeout in seconds
-        
+
     Returns:
         SearchOutput: Object containing the classification result and metadata
-        
+
     Raises:
         ValueError: If labels list is invalid (empty or less than 2 distinct labels)
         RuntimeError: If API response format is unexpected
@@ -92,14 +100,13 @@ def classify_scholarship_http(
     )
     user_prompt: str = f'Question: "{inp.query}"'
 
-    payload: Dict[str, Dict[str, List[Dict[str, str]]] | Dict[str, float]] = {
+    payload = {
         "contents": [
             {"role": "user", "parts": [{"text": system_prompt}]},
             {"role": "user", "parts": [{"text": user_prompt}]},
         ],
         "generationConfig": {"temperature": temperature},
     }
-
     resp = requests.post(
         ENDPOINT,
         params={"key": API_KEY},
@@ -112,7 +119,7 @@ def classify_scholarship_http(
     try:
         reply_text: str = (
             data["candidates"][0]["content"]["parts"][0]["text"]
-            .strip('"\' \n\t\r')
+            .strip("\"' \n\t\r")
             .lower()
         )
     except (KeyError, IndexError):
