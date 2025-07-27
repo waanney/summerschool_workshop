@@ -29,6 +29,7 @@ from utils.basetools.semantic_splitter import (
 
 class DocumentStatus(str, Enum):
     """Enum for document processing status."""
+
     SUCCESS = "success"
     FAILED = "failed"
     NOT_FOUND = "not_found"
@@ -38,7 +39,7 @@ class DocumentStatus(str, Enum):
 
 class DocumentChunkingInput(BaseModel):
     """Input model for document chunking operations."""
-    
+
     document_path: str = Field(
         ..., description="The absolute path to the document to be chunked."
     )
@@ -64,7 +65,7 @@ class DocumentChunkingInput(BaseModel):
 
 class DocumentChunkingOutput(BaseModel):
     """Output model for document chunking operations."""
-    
+
     success: bool = Field(
         ...,
         description="Indicates whether the document chunking and indexing was successful.",
@@ -84,20 +85,20 @@ def document_chunking_tool(input: DocumentChunkingInput) -> DocumentChunkingOutp
     """
     Chunks a document, saves it to a temporary CSV, and uses the MilvusIndexer
     class to index the data into Milvus.
-    
+
     This function processes documents by:
     1. Loading the document content based on file type
     2. Splitting the content into semantically coherent chunks
     3. Creating a temporary CSV file with the chunks
     4. Indexing the chunks into Milvus using the MilvusIndexer
     5. Cleaning up temporary files
-    
+
     Args:
         input: DocumentChunkingInput object containing all necessary parameters
-        
+
     Returns:
         DocumentChunkingOutput: Object containing the operation result and metadata
-        
+
     Raises:
         FileNotFoundError: If the document file doesn't exist
         ValueError: If the document is empty or unsupported format
@@ -117,16 +118,16 @@ def document_chunking_tool(input: DocumentChunkingInput) -> DocumentChunkingOutp
         content: str = _load_document_content(doc_path)
         if content is None:
             return DocumentChunkingOutput(
-                success=False, 
-                message="Unsupported file type", 
+                success=False,
+                message="Unsupported file type",
                 num_chunks=0,
                 status=DocumentStatus.UNSUPPORTED_FORMAT,
             )
-        
+
         if not content:
             return DocumentChunkingOutput(
-                success=False, 
-                message="Document is empty.", 
+                success=False,
+                message="Document is empty.",
                 num_chunks=0,
                 status=DocumentStatus.EMPTY,
             )
@@ -142,8 +143,8 @@ def document_chunking_tool(input: DocumentChunkingInput) -> DocumentChunkingOutp
         chunks: List[str] = splitter.split(content)
         if not chunks:
             return DocumentChunkingOutput(
-                success=False, 
-                message="No chunks generated.", 
+                success=False,
+                message="No chunks generated.",
                 num_chunks=0,
                 status=DocumentStatus.FAILED,
             )
@@ -157,8 +158,7 @@ def document_chunking_tool(input: DocumentChunkingInput) -> DocumentChunkingOutp
         try:
             # 4. Instantiate and run the MilvusIndexer with the temp file
             indexer: MilvusIndexer = MilvusIndexer(
-                collection_name=input.collection_name, 
-                faq_file=temp_csv_path
+                collection_name=input.collection_name, faq_file=temp_csv_path
             )
             indexer.run()
 
@@ -168,8 +168,8 @@ def document_chunking_tool(input: DocumentChunkingInput) -> DocumentChunkingOutp
             )
 
             return DocumentChunkingOutput(
-                success=True, 
-                message=message, 
+                success=True,
+                message=message,
                 num_chunks=len(chunks),
                 status=DocumentStatus.SUCCESS,
             )
@@ -182,8 +182,8 @@ def document_chunking_tool(input: DocumentChunkingInput) -> DocumentChunkingOutp
     except Exception as e:
         traceback.print_exc()
         return DocumentChunkingOutput(
-            success=False, 
-            message=f"An error occurred: {str(e)}", 
+            success=False,
+            message=f"An error occurred: {str(e)}",
             num_chunks=0,
             status=DocumentStatus.FAILED,
         )
@@ -192,13 +192,13 @@ def document_chunking_tool(input: DocumentChunkingInput) -> DocumentChunkingOutp
 def _load_document_content(doc_path: Path) -> str | None:
     """
     Load document content based on file extension.
-    
+
     Args:
         doc_path: Path to the document file
-        
+
     Returns:
         str | None: Document content or None if unsupported format
-        
+
     Raises:
         FileNotFoundError: If the file doesn't exist
         UnicodeDecodeError: If text file encoding is not UTF-8
@@ -206,7 +206,7 @@ def _load_document_content(doc_path: Path) -> str | None:
         docx2txt.Docx2txtError: If DOCX is corrupted
     """
     file_extension: str = doc_path.suffix.lower()
-    
+
     if file_extension == FileType.TXT:
         return load_txt(doc_path)
     elif file_extension == FileType.PDF:
@@ -220,13 +220,13 @@ def _load_document_content(doc_path: Path) -> str | None:
 def _create_temp_csv(chunks: List[str]) -> str:
     """
     Create a temporary CSV file with document chunks.
-    
+
     Args:
         chunks: List of text chunks to write to CSV
-        
+
     Returns:
         str: Path to the created temporary CSV file
-        
+
     Raises:
         IOError: If unable to create or write to temporary file
     """
@@ -239,5 +239,5 @@ def _create_temp_csv(chunks: List[str]) -> str:
         writer.writerow(["text"])  # Write header
         for chunk in chunks:
             writer.writerow([chunk])  # Write each chunk as a row
-    
+
     return temp_csv_path

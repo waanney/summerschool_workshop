@@ -202,8 +202,7 @@ class MilvusIndexer:
                 entity_type = type(entity[0])
             else:
                 entity_type = type(entity)
-            logger.info(
-                f"Entity {i}: {entity_type if entity else 'empty'}")
+            logger.info(f"Entity {i}: {entity_type if entity else 'empty'}")
 
         insert_result = self.collection.insert(entities)
         self.collection.flush()

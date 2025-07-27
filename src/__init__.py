@@ -36,4 +36,4 @@ from . import mcp_tools
 
 __version__ = "1.0.0"
 __author__ = "Summerschool Workshop Team"
-__description__ = "Main source package for the summerschool workshop project" 
+__description__ = "Main source package for the summerschool workshop project"

@@ -48,7 +48,7 @@ typing, and documentation standards for tool development.
 
 # class SearchRelevantDocumentInput(BaseModel):
 #     """Input model for document search operations."""
-#     
+#
 #     user_query: str = Field(..., description="The user's query to search for relevant documents")
 #     k: int = Field(3, description="The maximum number of documents to return")
 #     threshold: float = Field(0.7, description="The minimum similarity score for a document to be considered relevant")
@@ -62,7 +62,7 @@ typing, and documentation standards for tool development.
 
 # class DocumentResult(BaseModel):
 #     """Model for individual document search results."""
-#     
+#
 #     text: str = Field(..., description="The document text content")
 #     score: float = Field(..., description="Similarity score for the document")
 #     source: str = Field(default="", description="Source of the document")
@@ -70,7 +70,7 @@ typing, and documentation standards for tool development.
 
 # class SearchRelevantDocumentOutput(BaseModel):
 #     """Output model for document search operations."""
-#     
+#
 #     documents: List[DocumentResult] = Field(..., description="List of relevant document chunks retrieved from the vector database")
 #     total_found: int = Field(..., description="Total number of documents found")
 #     query: str = Field(..., description="The original user query")
@@ -84,18 +84,18 @@ typing, and documentation standards for tool development.
 # def search_relevant_document(input: SearchRelevantDocumentInput) -> SearchRelevantDocumentOutput:
 #     """
 #     Search for relevant document chunks based on a user query.
-#     
+#
 #     This function serves as a core retrieval component in a Retrieval-Augmented
 #     Generation (RAG) system by fetching relevant document passages from a vector
 #     database. It differs from FAQ tools by retrieving raw text chunks rather
 #     than pre-defined question-answer pairs.
-#     
+#
 #     Args:
 #         input: SearchRelevantDocumentInput object containing search parameters
-#         
+#
 #     Returns:
 #         SearchRelevantDocumentOutput: Object containing relevant documents and metadata
-#         
+#
 #     Raises:
 #         ConnectionError: If unable to connect to Milvus
 #         ValueError: If query is empty or invalid
@@ -129,7 +129,7 @@ typing, and documentation standards for tool development.
 #             query=input.user_query,
 #             status=SearchStatus.SUCCESS if relevant_documents else SearchStatus.NO_RESULTS
 #         )
-#         
+#
 #     except Exception as e:
 #         return SearchRelevantDocumentOutput(
 #             documents=[],
@@ -146,10 +146,10 @@ typing, and documentation standards for tool development.
 # def _validate_search_parameters(input: SearchRelevantDocumentInput) -> bool:
 #     """
 #     Validate search input parameters.
-#     
+#
 #     Args:
 #         input: Search input parameters to validate
-#         
+#
 #     Returns:
 #         bool: True if parameters are valid, False otherwise
 #     """
@@ -169,24 +169,24 @@ typing, and documentation standards for tool development.
 # def create_search_tool(collection_name: str = "summerschool_workshop") -> callable:
 #     """
 #     Create a search tool function with a pre-configured collection name.
-#     
+#
 #     This factory function creates a configured search function that uses
 #     a specific Milvus collection. The collection name is fixed and cannot
 #     be changed by the calling code.
-#     
+#
 #     Args:
 #         collection_name: Name of the Milvus collection to use for searches
-#         
+#
 #     Returns:
 #         callable: A function that performs searches using the specified collection
 #     """
 #     def configured_search_tool(input: SearchRelevantDocumentInput) -> SearchRelevantDocumentOutput:
 #         """
 #         Configured search function with fixed collection name.
-#         
+#
 #         Args:
 #             input: SearchRelevantDocumentInput object containing search parameters
-#             
+#
 #         Returns:
 #             SearchRelevantDocumentOutput: Object containing search results and metadata
 #         """

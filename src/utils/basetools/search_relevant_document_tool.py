@@ -18,6 +18,7 @@ from data.milvus.milvus_client import MilvusClient
 
 class SearchStatus(str, Enum):
     """Enum for search operation status."""
+
     SUCCESS = "success"
     NO_RESULTS = "no_results"
     BELOW_THRESHOLD = "below_threshold"
@@ -26,7 +27,7 @@ class SearchStatus(str, Enum):
 
 class SearchRelevantDocumentInput(BaseModel):
     """Input model for relevant document search operations."""
-    
+
     user_query: str = Field(
         ..., description="The user's query to search for relevant documents"
     )
@@ -43,7 +44,7 @@ class SearchRelevantDocumentInput(BaseModel):
 
 class DocumentResult(BaseModel):
     """Model for individual document search results."""
-    
+
     text: str = Field(..., description="The document text content")
     score: float = Field(..., description="Similarity score for the document")
     source: str = Field(default="", description="Source of the document")
@@ -51,14 +52,16 @@ class DocumentResult(BaseModel):
 
 class SearchRelevantDocumentOutput(BaseModel):
     """Output model for relevant document search operations."""
-    
+
     documents: List[DocumentResult] = Field(
         ...,
         description="List of relevant document chunks retrieved from the vector database",
     )
     total_found: int = Field(..., description="Total number of documents found")
     query: str = Field(..., description="The original user query")
-    status: SearchStatus = Field(SearchStatus.SUCCESS, description="Status of the search operation")
+    status: SearchStatus = Field(
+        SearchStatus.SUCCESS, description="Status of the search operation"
+    )
 
 
 # Global embedding engine instance
@@ -70,18 +73,18 @@ def search_relevant_document(
 ) -> SearchRelevantDocumentOutput:
     """
     Search for relevant document chunks based on a user query.
-    
+
     This function serves as a core retrieval component in a Retrieval-Augmented
     Generation (RAG) system by fetching relevant document passages from a vector
     database. It differs from FAQ tools by retrieving raw text chunks rather
     than pre-defined question-answer pairs.
-    
+
     Args:
         input: SearchRelevantDocumentInput object containing search parameters
-        
+
     Returns:
         SearchRelevantDocumentOutput: Object containing relevant documents and metadata
-        
+
     Raises:
         ConnectionError: If unable to connect to Milvus
         ValueError: If query is empty or invalid
@@ -90,7 +93,9 @@ def search_relevant_document(
     try:
         client: MilvusClient = MilvusClient(collection_name=input.collection_name)
 
-        query_embedding: List[float] = embedding_engine.get_query_embedding(input.user_query)
+        query_embedding: List[float] = embedding_engine.get_query_embedding(
+            input.user_query
+        )
 
         search_results: List[Dict[str, str | float]] = client.generic_hybrid_search(
             query_dense_embedding=query_embedding,
@@ -105,39 +110,40 @@ def search_relevant_document(
                 document_result: DocumentResult = DocumentResult(
                     text=str(result.get("text", "")),
                     score=score,
-                    source=str(result.get("source", ""))
+                    source=str(result.get("source", "")),
                 )
                 relevant_documents.append(document_result)
 
-        status: SearchStatus = _determine_search_status(relevant_documents, input.threshold)
-        
+        status: SearchStatus = _determine_search_status(
+            relevant_documents, input.threshold
+        )
+
         return SearchRelevantDocumentOutput(
             documents=relevant_documents,
             total_found=len(relevant_documents),
             query=input.user_query,
-            status=status
+            status=status,
         )
-        
+
     except Exception as e:
         return SearchRelevantDocumentOutput(
             documents=[],
             total_found=0,
             query=input.user_query,
-            status=SearchStatus.ERROR
+            status=SearchStatus.ERROR,
         )
 
 
 def _determine_search_status(
-    documents: List[DocumentResult], 
-    threshold: float
+    documents: List[DocumentResult], threshold: float
 ) -> SearchStatus:
     """
     Determine the status of the search operation based on results.
-    
+
     Args:
         documents: List of found document results
         threshold: Minimum similarity threshold used
-        
+
     Returns:
         SearchStatus: Status indicating the search outcome
     """
