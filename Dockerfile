@@ -25,9 +25,6 @@ RUN uv sync --frozen
 # Create logs directory
 RUN mkdir -p logs
 
-# Expose port for Chainlit
-EXPOSE 8000
-
 # Set environment variables
 ENV PYTHONPATH=/app/src
 ENV PYTHONUNBUFFERED=1

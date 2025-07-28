@@ -31,7 +31,6 @@ build:
 up: setup
 	docker-compose up -d
 	@echo "Services started. Access the application at:"
-	@echo "  - Chainlit Interface: http://localhost:8000"
 	@echo "  - Milvus: http://localhost:19530"
 	@echo "  - MinIO Console: http://localhost:9001"
 	@echo "  - Redis: localhost:6379"
@@ -77,3 +76,7 @@ dev-up: setup
 health:
 	@echo "Checking service health..."
 	@docker-compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
+
+up-chatbot:
+	@echo "Starting chatbot service..."
+	chainlit run workflow/main.py --port 8001
