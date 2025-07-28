@@ -39,7 +39,7 @@ The easiest way to run this project on any device is using Docker:
 
 3. **Start all services**
    ```bash
-   make up
+   make build
    ```
 
 4. **Access the application**
@@ -47,6 +47,10 @@ The easiest way to run this project on any device is using Docker:
    - **Milvus**: http://localhost:19530
    - **MinIO Console**: http://localhost:9001
 
+5. **Run the chatbot**
+   ```
+   make up-chatbot
+   ```
 For detailed Docker setup instructions, see [DOCKER_SETUP.md](DOCKER_SETUP.md).
 
 ### 🐍 Local Python Setup

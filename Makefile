@@ -78,16 +78,15 @@ health:
 	@docker-compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
 
 up-chatbot: setup
-	@echo "🎨 Starting Makeup Chatbot Setup..."
-	@echo "📦 Installing UV package manager..."
-	@curl -LsSf https://astral.sh/uv/install.sh | sh || pip install uv
-	@echo "📚 Installing Python dependencies..."
-	@uv sync
-	@echo "🐳 Building and starting services..."
-	@docker-compose up -d
-	@echo "⏳ Waiting for services to be ready..."
-	@sleep 15
-	@echo "🎉 Makeup Chatbot is ready!"
-	@echo "🌐 Access at: http://localhost:8000"
-	@echo "📋 To view logs: make app-logs"
-	@echo "🛑 To stop: make down"
+	@docker network inspect chatbot > /dev/null 2>&1 || docker network create chatbot
+	docker run -d --name redis --network chatbot redis   
+	docker-compose up -d
+
+run-chatbot:
+	@docker rm -f summerschool_workshop-app || true
+	docker run --name summerschool_workshop-app \
+		--env-file .env \
+		--network chatbot \
+		-p 8001:8001 \
+		summerschool_workshop-app
+

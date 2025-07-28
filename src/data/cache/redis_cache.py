@@ -11,7 +11,7 @@ class ShortTermMemory:
 
     def __init__(
         self,
-        host: str = "localhost",
+        host: str = "redis",
         port: int = 6379,
         db: int = 0,
         max_messages: int = 15,

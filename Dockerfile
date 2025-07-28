@@ -16,11 +16,12 @@ RUN pip install uv
 # Copy dependency files first for better caching
 COPY pyproject.toml uv.lock ./
 
-# Install Python dependencies
-RUN uv sync --frozen
-
 # Copy source code
 COPY . .
+
+# Install Python dependencies
+RUN uv sync
+
 
 # Create logs directory
 RUN mkdir -p logs
@@ -37,4 +38,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Default command to run Makeup Chatbot
-CMD ["uv", "run", "chainlit", "run", "workflow/main.py", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "chainlit", "run", "workflow/main.py", "--host", "0.0.0.0", "--port", "8001"]
