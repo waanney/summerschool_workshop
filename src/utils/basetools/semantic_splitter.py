@@ -120,9 +120,9 @@ class SemanticSplitter:
             self._nlp.add_pipe(
                 "sentencizer", config={"punct_chars": [".", "!", "?", "…"]}
             )
-            if self.model_name == "sentence-transformers/all-MiniLM-L6-v2":
+            if self.model_name == "all-MiniLM-L6-v2":
                 self.model_name = (
-                    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+                    "paraphrase-multilingual-MiniLM-L12-v2"
                 )
         elif self.language == Language.ENGLISH:
             # Use blank English pipeline + sentencizer
