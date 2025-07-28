@@ -77,6 +77,17 @@ health:
 	@echo "Checking service health..."
 	@docker-compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
 
-up-chatbot:
-	@echo "Starting chatbot service..."
-	chainlit run workflow/main.py --port 8001
+up-chatbot: setup
+	@echo "🎨 Starting Makeup Chatbot Setup..."
+	@echo "📦 Installing UV package manager..."
+	@curl -LsSf https://astral.sh/uv/install.sh | sh || pip install uv
+	@echo "📚 Installing Python dependencies..."
+	@uv sync
+	@echo "🐳 Building and starting services..."
+	@docker-compose up -d
+	@echo "⏳ Waiting for services to be ready..."
+	@sleep 15
+	@echo "🎉 Makeup Chatbot is ready!"
+	@echo "🌐 Access at: http://localhost:8000"
+	@echo "📋 To view logs: make app-logs"
+	@echo "🛑 To stop: make down"
