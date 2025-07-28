@@ -13,14 +13,14 @@ RUN apt-get update && apt-get install -y \
 # Install UV package manager
 RUN pip install uv
 
-# Copy dependency files
+# Copy dependency files first for better caching
 COPY pyproject.toml uv.lock ./
-
-# Copy source code
-COPY . .
 
 # Install Python dependencies
 RUN uv sync --frozen
+
+# Copy source code
+COPY . .
 
 # Create logs directory
 RUN mkdir -p logs
@@ -29,5 +29,12 @@ RUN mkdir -p logs
 ENV PYTHONPATH=/app/src
 ENV PYTHONUNBUFFERED=1
 
-# Default command to run Chainlit
-CMD ["uv", "run", "chainlit", "run", "workflow/SAMPLE.py", "--host", "0.0.0.0", "--port", "8000"]
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Default command to run Makeup Chatbot
+CMD ["uv", "run", "chainlit", "run", "workflow/main.py", "--host", "0.0.0.0", "--port", "8000"]
