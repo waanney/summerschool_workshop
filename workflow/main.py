@@ -50,5 +50,3 @@ async def main(message: cl.Message):
     memory_handler.store_bot_response(response.output)
     
     await cl.Message(content=str(response.output)).send()
-
- 
