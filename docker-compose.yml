@@ -6,8 +6,8 @@ services:
       - "8000:8000"
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - MILVUS_URI=http://milvus:19530
-      - MILVUS_TOKEN=${MILVUS_TOKEN:-}
+      - MILVUS_URI=${MILVUS_URI}
+      - MILVUS_TOKEN=${MILVUS_TOKEN}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - ENVIRONMENT=production
