@@ -49,7 +49,7 @@ The easiest way to run this project on any device is using Docker:
 
 5. **Run the chatbot**
    ```
-   make up-chatbot
+   make run-chatbot
    ```
 For detailed Docker setup instructions, see [DOCKER_SETUP.md](DOCKER_SETUP.md).
 
