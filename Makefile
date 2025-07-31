@@ -77,11 +77,11 @@ health:
 	@echo "Checking service health..."
 	@docker-compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
 
-up-chatbot: setup
-	@docker network inspect chatbot > /dev/null 2>&1 || docker network create chatbot
-	docker-compose up -d
+	
 
-run-chatbot:
+run-chatbot:setup
+	@docker network inspect chatbot > /dev/null 2>&1 || docker network create chatbot
+		docker-compose up -d
 	docker-compose up --build -d app
 
 
