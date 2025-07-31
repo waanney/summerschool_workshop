@@ -79,14 +79,9 @@ health:
 
 up-chatbot: setup
 	@docker network inspect chatbot > /dev/null 2>&1 || docker network create chatbot
-	docker run -d --name redis --network chatbot redis   
 	docker-compose up -d
 
 run-chatbot:
-	@docker rm -f summerschool_workshop-app || true
-	docker run --name summerschool_workshop-app \
-		--env-file .env \
-		--network chatbot \
-		-p 8001:8001 \
-		summerschool_workshop-app
+	docker-compose up --build -d app
+
 
