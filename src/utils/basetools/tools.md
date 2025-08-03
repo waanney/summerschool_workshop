@@ -1,22 +1,22 @@
-# Tools và Extensions
+# Tools and Extensions
 
-## Tổng quan
+## Overview
 
-Hệ thống cung cấp một bộ tools phong phú để mở rộng khả năng của AI agents. Các tools này được thiết kế theo pattern có thể tái sử dụng và dễ dàng tích hợp.
+The system provides a rich set of tools to extend the capabilities of AI agents. These tools are designed in a reusable pattern and are easy to integrate.
 
 ## Built-in Tools
 
 ### 1. FAQ Tool
 
-Tool mạnh mẽ nhất để search trong knowledge base sử dụng hybrid search.
+The most powerful tool for searching a knowledge base using hybrid search.
 
 ```python
 from utils.basetools import create_faq_tool, SearchInput
 
-# Tạo tool
+# Create tool
 faq_tool = create_faq_tool(collection_name="my_knowledge_base")
 
-# Sử dụng programmatically
+# Use programmatically
 result = faq_tool(SearchInput(
     query="How to apply for scholarship?",
     limit=5,
@@ -27,22 +27,24 @@ print(result.results)
 ```
 
 **Features:**
-- Hybrid search (semantic + keyword)
-- Configurable collection name
-- Adjustable result limit
-- Option to search in answers
+
+* Hybrid search (semantic + keyword)
+* Configurable collection name
+* Adjustable result limit
+* Option to search in answers
 
 **Use cases:**
-- Customer support chatbots
-- Educational Q&A systems
-- Internal knowledge management
-- Documentation search
+
+* Customer support chatbots
+* Educational Q\&A systems
+* Internal knowledge management
+* Documentation search
 
 ---
 
 ### 2. HTTP Tool
 
-Versatile HTTP client cho việc gọi external APIs.
+Versatile HTTP client for calling external APIs.
 
 ```python
 from utils.basetools import http_tool, HttpRequest, HTTPMethod
@@ -71,17 +73,19 @@ response = http_tool(HttpRequest(
 ```
 
 **Features:**
-- Support tất cả HTTP methods
-- Flexible body types (JSON, Form, Raw)
-- Custom headers và parameters
-- Configurable timeout
-- Multiple response types
+
+* Supports all HTTP methods
+* Flexible body types (JSON, Form, Raw)
+* Custom headers and parameters
+* Configurable timeout
+* Multiple response types
 
 **Use cases:**
-- API integration
-- Web scraping
-- Data fetching
-- Third-party service calls
+
+* API integration
+* Web scraping
+* Data fetching
+* Third-party service calls
 
 ---
 
@@ -92,14 +96,14 @@ Professional email sending capabilities.
 ```python
 from utils.basetools import create_send_email_tool, EmailToolInput
 
-# Tạo email tool
+# Create email tool
 email_tool = create_send_email_tool(
     to_emails=["admin@company.com", "support@company.com"],
     sender_email="bot@company.com",
     sender_password="app_password"
 )
 
-# Gửi email
+# Send email
 result = email_tool(EmailToolInput(
     subject="New Support Request",
     body="A new support request has been received from user John Doe."
@@ -110,17 +114,19 @@ print(result.message)  # Success/Error message
 ```
 
 **Features:**
-- Multiple recipients
-- HTML/Plain text support
-- SMTP configuration
-- Error handling
-- Environment variable support
+
+* Multiple recipients
+* HTML/Plain text support
+* SMTP configuration
+* Error handling
+* Environment variable support
 
 **Use cases:**
-- Notifications
-- Alerts
-- Reports
-- Customer communication
+
+* Notifications
+* Alerts
+* Reports
+* Customer communication
 
 ---
 
@@ -145,17 +151,19 @@ print(result.result)  # 2.0
 ```
 
 **Features:**
-- Basic arithmetic operations
-- Trigonometric functions
-- Logarithmic functions
-- Scientific constants
-- Memory operations
+
+* Basic arithmetic operations
+* Trigonometric functions
+* Logarithmic functions
+* Scientific constants
+* Memory operations
 
 **Use cases:**
-- Financial calculations
-- Scientific computations
-- Data analysis
-- Engineering calculations
+
+* Financial calculations
+* Scientific computations
+* Data analysis
+* Engineering calculations
 
 ---
 
@@ -166,14 +174,14 @@ Comprehensive file operations.
 ```python
 from utils.basetools import create_read_file_tool, FileContentOutput
 
-# Tạo file reader tool
+# Create file reader tool
 file_tool = create_read_file_tool(allowed_extensions=[".txt", ".md", ".json"])
 
-# Đọc file
+# Read file
 content = file_tool("path/to/file.txt")
 print(content.content)
 
-# Search trong file
+# Search within file
 from utils.basetools import create_search_in_file_tool
 
 search_tool = create_search_in_file_tool(
@@ -188,17 +196,19 @@ results = search_tool(SearchInput(
 ```
 
 **Features:**
-- Multiple file format support
-- Content extraction
-- Search within files
-- Fuzzy matching
-- Security restrictions
+
+* Multiple file format support
+* Content extraction
+* Search within files
+* Fuzzy matching
+* Security restrictions
 
 **Use cases:**
-- Document analysis
-- Content extraction
-- Data processing
-- Information retrieval
+
+* Document analysis
+* Content extraction
+* Data processing
+* Information retrieval
 
 ---
 
@@ -356,7 +366,7 @@ def weather_tool(input: WeatherInput) -> WeatherOutput:
     )
 ```
 
-## Tool Configuration và Best Practices
+## Tool Configuration and Best Practices
 
 ### 1. Tool Factory Pattern
 
@@ -446,7 +456,7 @@ def expensive_api_tool(input: APIInput) -> APIOutput:
     pass
 ```
 
-## Tool Integration với Agents
+## Tool Integration with Agents
 
 ### 1. Multi-tool Agent
 
@@ -551,7 +561,7 @@ def test_faq_search(faq_tool):
     assert len(result.results) <= 3
 ```
 
-## Tool Monitoring và Logging
+## Tool Monitoring and Logging
 
 ### 1. Tool Usage Tracking
 
@@ -602,30 +612,6 @@ def performance_monitor(func):
         process = psutil.Process()
         cpu_before = process.cpu_percent()
         memory_before = process.memory_info().rss / 1024 / 1024  # MB
-        
-        start_time = time.time()
-        
-        try:
-            result = func(*args, **kwargs)
-            
-            # Get final metrics
-            execution_time = time.time() - start_time
-            cpu_after = process.cpu_percent()
-            memory_after = process.memory_info().rss / 1024 / 1024  # MB
-            
-            # Log performance metrics
-            logging.info(f"Tool {func.__name__} performance:")
-            logging.info(f"  Execution time: {execution_time:.2f}s")
-            logging.info(f"  CPU usage: {cpu_after:.1f}%")
-            logging.info(f"  Memory usage: {memory_after:.1f}MB")
-            
-            return result
-            
-        except Exception as e:
-            logging.error(f"Tool {func.__name__} failed: {str(e)}")
-            raise
-    
-    return wrapper
-```
+       
 
-Với hệ thống tools này, bạn có thể xây dựng các AI agents rất mạnh mẽ và linh hoạt cho nhiều use cases khác nhau!
+```

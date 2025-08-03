@@ -1,12 +1,6 @@
-"""
-Calculator Tool for mathematical operations
-Supports basic arithmetic, scientific functions, and complex expressions
-Designed for use with AI agents and includes Pydantic models for structured input/output
-"""
-
 import math
 import re
-from typing import Union,Optional
+from typing import Union, Optional, List
 from decimal import getcontext
 import ast
 import operator
@@ -69,6 +63,20 @@ class BasicOperationInput(BaseModel):
     )
 
 
+class BasicOperationOutput(BaseModel):
+    """Output model for basic arithmetic operations."""
+
+    result: Union[float, int] = Field(..., description="The calculated result")
+    expression: str = Field(..., description="The mathematical expression")
+    operation: str = Field(..., description="The operation performed")
+    success: bool = Field(
+        default=True, description="Whether the calculation was successful"
+    )
+    error_message: Optional[str] = Field(
+        default=None, description="Error message if calculation failed"
+    )
+
+
 class TrigonometricInput(BaseModel):
     """Input model for trigonometric operations."""
 
@@ -77,6 +85,22 @@ class TrigonometricInput(BaseModel):
         ..., description="Trigonometric function: sin, cos, tan, asin, acos, atan"
     )
     degrees: bool = Field(default=False, description="Whether angle is in degrees")
+
+
+class TrigonometricOutput(BaseModel):
+    """Output model for trigonometric operations."""
+
+    result: float = Field(..., description="The calculated result")
+    expression: str = Field(..., description="The trigonometric expression")
+    function: str = Field(..., description="The trigonometric function used")
+    angle: float = Field(..., description="The input angle")
+    degrees: bool = Field(..., description="Whether angle was in degrees")
+    success: bool = Field(
+        default=True, description="Whether the calculation was successful"
+    )
+    error_message: Optional[str] = Field(
+        default=None, description="Error message if calculation failed"
+    )
 
 
 class LogarithmInput(BaseModel):
@@ -98,6 +122,21 @@ class LogarithmInput(BaseModel):
         return v
 
 
+class LogarithmOutput(BaseModel):
+    """Output model for logarithmic operations."""
+
+    result: float = Field(..., description="The calculated result")
+    expression: str = Field(..., description="The logarithmic expression")
+    number: float = Field(..., description="The input number")
+    base: float = Field(..., description="The logarithm base")
+    success: bool = Field(
+        default=True, description="Whether the calculation was successful"
+    )
+    error_message: Optional[str] = Field(
+        default=None, description="Error message if calculation failed"
+    )
+
+
 class MemoryOperation(BaseModel):
     """Input model for memory operations."""
 
@@ -109,13 +148,36 @@ class MemoryOperation(BaseModel):
     )
 
 
-class CalculatorTool:
-    """A comprehensive calculator tool with support for various mathematical operations."""
+class MemoryOutput(BaseModel):
+    """Output model for memory operations."""
 
-    # Set precision for decimal calculations
+    operation: str = Field(..., description="The memory operation performed")
+    memory_value: float = Field(..., description="Current value in memory")
+    result: Optional[Union[float, str]] = Field(
+        default=None, description="Result of the operation"
+    )
+    success: bool = Field(
+        default=True, description="Whether the operation was successful"
+    )
+    error_message: Optional[str] = Field(
+        default=None, description="Error message if operation failed"
+    )
+
+
+class HistoryOutput(BaseModel):
+    """Output model for history operations."""
+
+    history: List[str] = Field(..., description="List of calculation history entries")
+    count: int = Field(..., description="Number of history entries")
+    success: bool = Field(
+        default=True, description="Whether the operation was successful"
+    )
+
+
+class CalculatorTool:
+
     getcontext().prec = 28
 
-    # Safe operators for eval
     SAFE_OPERATORS = {
         ast.Add: operator.add,
         ast.Sub: operator.sub,
@@ -196,7 +258,7 @@ class CalculatorTool:
         """Raise base to the power of exponent."""
         result = base**exponent
         self._add_to_history(f"{base}^{exponent} = {result}")
-        return result
+        return float(result)
 
     def square_root(self, number: float) -> float:
         """Calculate square root of a number."""
@@ -346,6 +408,8 @@ class CalculatorTool:
         """Replace function names for easier parsing."""
         # Handle sqrt specially
         expression = re.sub(r"sqrt\(([^)]+)\)", r"(\1)**(0.5)", expression)
+        # Handle power operator (^ to **)
+        expression = re.sub(r"(\d+)\^(\d+)", r"\1**\2", expression)
         return expression
 
     def memory_store(self, value: float) -> None:
@@ -432,7 +496,7 @@ class CalculatorTool:
                 error_message=str(e),
             )
 
-    def basic_operation(self, input_data: BasicOperationInput) -> CalculationOutput:
+    def basic_operation(self, input_data: BasicOperationInput) -> BasicOperationOutput:
         """Perform basic arithmetic operations with validation."""
         try:
             operations = {
@@ -449,27 +513,25 @@ class CalculatorTool:
             result = operations[input_data.operation](input_data.a, input_data.b)
             expression = f"{input_data.a} {input_data.operation} {input_data.b}"
 
-            return CalculationOutput(
+            return BasicOperationOutput(
                 result=result,
                 expression=expression,
-                formatted_result=str(result),
-                operation_type=OperationType.BASIC,
+                operation=input_data.operation,
                 success=True,
             )
 
         except Exception as e:
-            return CalculationOutput(
+            return BasicOperationOutput(
                 result=0,
                 expression=f"{input_data.a} {input_data.operation} {input_data.b}",
-                formatted_result="Error",
-                operation_type=OperationType.BASIC,
+                operation=input_data.operation,
                 success=False,
                 error_message=str(e),
             )
 
     def trigonometric_operation(
         self, input_data: TrigonometricInput
-    ) -> CalculationOutput:
+    ) -> TrigonometricOutput:
         """Perform trigonometric operations with validation."""
         try:
             functions = {"sin": self.sin, "cos": self.cos, "tan": self.tan}
@@ -485,25 +547,27 @@ class CalculatorTool:
             unit = "°" if input_data.degrees else "rad"
             expression = f"{input_data.function}({input_data.angle}{unit})"
 
-            return CalculationOutput(
+            return TrigonometricOutput(
                 result=result,
                 expression=expression,
-                formatted_result=str(result),
-                operation_type=OperationType.TRIGONOMETRIC,
+                function=input_data.function,
+                angle=input_data.angle,
+                degrees=input_data.degrees,
                 success=True,
             )
 
         except Exception as e:
-            return CalculationOutput(
+            return TrigonometricOutput(
                 result=0,
                 expression=f"{input_data.function}({input_data.angle})",
-                formatted_result="Error",
-                operation_type=OperationType.TRIGONOMETRIC,
+                function=input_data.function,
+                angle=input_data.angle,
+                degrees=input_data.degrees,
                 success=False,
                 error_message=str(e),
             )
 
-    def logarithm_operation(self, input_data: LogarithmInput) -> CalculationOutput:
+    def logarithm_operation(self, input_data: LogarithmInput) -> LogarithmOutput:
         """Perform logarithmic operations with validation."""
         try:
             result = self.log(input_data.number, input_data.base)
@@ -515,25 +579,25 @@ class CalculatorTool:
             else:
                 expression = f"log_{input_data.base}({input_data.number})"
 
-            return CalculationOutput(
+            return LogarithmOutput(
                 result=result,
                 expression=expression,
-                formatted_result=str(result),
-                operation_type=OperationType.LOGARITHMIC,
+                number=input_data.number,
+                base=input_data.base,
                 success=True,
             )
 
         except Exception as e:
-            return CalculationOutput(
+            return LogarithmOutput(
                 result=0,
                 expression=f"log({input_data.number})",
-                formatted_result="Error",
-                operation_type=OperationType.LOGARITHMIC,
+                number=input_data.number,
+                base=input_data.base,
                 success=False,
                 error_message=str(e),
             )
 
-    def memory_operation(self, input_data: MemoryOperation) -> dict:
+    def memory_operation(self, input_data: MemoryOperation) -> MemoryOutput:
         """Perform memory operations with validation."""
         try:
             operations = {
@@ -558,20 +622,28 @@ class CalculatorTool:
             else:
                 result = operations[input_data.operation]()
 
-            return {
-                "success": True,
-                "operation": input_data.operation,
-                "result": result if result is not None else self.memory,
-                "memory_value": self.memory,
-            }
+            return MemoryOutput(
+                operation=input_data.operation,
+                memory_value=self.memory,
+                result=result if result is not None else self.memory,
+                success=True,
+            )
 
         except Exception as e:
-            return {
-                "success": False,
-                "operation": input_data.operation,
-                "error_message": str(e),
-                "memory_value": self.memory,
-            }
+            return MemoryOutput(
+                operation=input_data.operation,
+                memory_value=self.memory,
+                error_message=str(e),
+                success=False,
+            )
+
+    def get_history_output(self) -> HistoryOutput:
+        """Get calculation history in a structured format."""
+        return HistoryOutput(
+            history=self.history,
+            count=len(self.history),
+            success=True,
+        )
 
     def _determine_operation_type(self, expression: str) -> OperationType:
         """Determine the type of operation from expression."""
@@ -619,12 +691,10 @@ class CalculatorTool:
             calc.calculate("sin(30)", degrees=True)  # Returns 0.5
         """
         try:
-            # Create input model for validation
             input_data = CalculationInput(
                 expression=expression, degrees=degrees, precision=precision
             )
 
-            # Use the validated calculation method
             output = self.calculate_with_validation(input_data)
 
             if output.success:
@@ -640,7 +710,6 @@ class CalculatorTool:
 _calculator_instance = CalculatorTool()
 
 
-# Convenience function for quick calculations
 def calculate(expression: str) -> Union[float, int]:
     """Quick calculation function."""
     calc = CalculatorTool()
@@ -648,9 +717,7 @@ def calculate(expression: str) -> Union[float, int]:
 
 
 # Tool functions for agent usage
-def calculate_expression(
-    expression: str, degrees: bool = False, precision: Optional[int] = None
-) -> str:
+def calculate_expression(input_data: CalculationInput) -> CalculationOutput:
     """
     Calculate mathematical expressions for use in AI agents.
 
@@ -660,30 +727,40 @@ def calculate_expression(
         precision (Optional[int]): Number of decimal places to round to (default: None)
 
     Returns:
-        str: Formatted result with calculation details
+        CalculationOutput: Structured output with calculation result and metadata
 
     Examples:
-        calculate_expression("2 + 3 * 4") -> "2 + 3 * 4 = 14"
-        calculate_expression("sin(30)", degrees=True) -> "sin(30°) = 0.5"
-        calculate_expression("sqrt(16) + 2^3") -> "sqrt(16) + 2^3 = 12.0"
+        calculate_expression("2 + 3 * 4") -> CalculationOutput with result 14
+        calculate_expression("sin(30)", degrees=True) -> CalculationOutput with result 0.5
+        calculate_expression("sqrt(16) + 2^3") -> CalculationOutput with result 12.0
     """
     try:
-        input_data = CalculationInput(
-            expression=expression, degrees=degrees, precision=precision
-        )
-
-        result = _calculator_instance.calculate_with_validation(input_data)
+        result = _calculator_instance.calculate_with_validation(input_data.expression)
 
         if result.success:
-            return f"{result.expression} = {result.formatted_result}"
+            return result
         else:
-            return f"Error calculating '{expression}': {result.error_message}"
+            return CalculationOutput(
+                result=0,
+                expression=input_data.expression,
+                formatted_result="Error",
+                operation_type=OperationType.EXPRESSION,
+                success=False,
+                error_message=result.error_message,
+            )
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return CalculationOutput(
+            result=0,
+            expression=input_data.expression,
+            formatted_result="Error",
+            operation_type=OperationType.EXPRESSION,
+            success=False,
+            error_message=str(e),
+        )
 
 
-def basic_math(a: float, b: float, operation: str) -> str:
+def basic_math(input_data: BasicOperationInput) -> BasicOperationOutput:
     """
     Perform basic mathematical operations for use in AI agents.
 
@@ -693,14 +770,13 @@ def basic_math(a: float, b: float, operation: str) -> str:
         operation (str): Operation to perform (add, subtract, multiply, divide, power)
 
     Returns:
-        str: Formatted result with calculation details
+        BasicOperationOutput: Structured output with calculation result and metadata
 
     Examples:
-        basic_math(10, 3, "add") -> "10 + 3 = 13"
-        basic_math(15, 3, "divide") -> "15 ÷ 3 = 5"
+        basic_math(10, 3, "add") -> BasicOperationOutput with result 13
+        basic_math(15, 3, "divide") -> BasicOperationOutput with result 5
     """
     try:
-        input_data = BasicOperationInput(a=a, b=b, operation=operation)
         result = _calculator_instance.basic_operation(input_data)
 
         if result.success:
@@ -711,16 +787,28 @@ def basic_math(a: float, b: float, operation: str) -> str:
                 "divide": "÷",
                 "power": "^",
             }
-            symbol = symbol_map.get(operation, operation)
-            return f"{a} {symbol} {b} = {result.formatted_result}"
+            symbol = symbol_map.get(input_data.operation, input_data.operation)
+            return result
         else:
-            return f"Error: {result.error_message}"
+            return BasicOperationOutput(
+                result=0,
+                expression=f"{input_data.a} {symbol} {input_data.b}",
+                operation=input_data.operation,
+                success=False,
+                error_message=result.error_message,
+            )
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return BasicOperationOutput(
+            result=0,
+            expression=f"{input_data.a} {input_data.operation} {input_data.b}",
+            operation=input_data.operation,
+            success=False,
+            error_message=str(e),
+        )
 
 
-def trigonometry(angle: float, function: str, degrees: bool = True) -> str:
+def trigonometry(input_data: TrigonometricInput) -> TrigonometricOutput:
     """
     Calculate trigonometric functions for use in AI agents.
 
@@ -730,26 +818,41 @@ def trigonometry(angle: float, function: str, degrees: bool = True) -> str:
         degrees (bool): Whether angle is in degrees (default: True)
 
     Returns:
-        str: Formatted result with calculation details
+        TrigonometricOutput: Structured output with calculation result and metadata
 
     Examples:
-        trigonometry(30, "sin", True) -> "sin(30°) = 0.5"
-        trigonometry(1.57, "cos", False) -> "cos(1.57 rad) = 0.0007963"
+        trigonometry(30, "sin", True) -> TrigonometricOutput with result 0.5
+        trigonometry(1.57, "cos", False) -> TrigonometricOutput with result 0.0007963
     """
     try:
-        input_data = TrigonometricInput(angle=angle, function=function, degrees=degrees)
         result = _calculator_instance.trigonometric_operation(input_data)
 
         if result.success:
-            return f"{result.expression} = {result.formatted_result}"
+            return result
         else:
-            return f"Error: {result.error_message}"
+            return TrigonometricOutput(
+                result=0,
+                expression=f"{input_data.function}({input_data.angle})",
+                function=input_data.function,
+                angle=input_data.angle,
+                degrees=input_data.degrees,
+                success=False,
+                error_message=result.error_message,
+            )
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return TrigonometricOutput(
+            result=0,
+            expression=f"{input_data.function}({input_data.angle})",
+            function=input_data.function,
+            angle=input_data.angle,
+            degrees=input_data.degrees,
+            success=False,
+            error_message=str(e),
+        )
 
 
-def logarithm(number: float, base: float = math.e) -> str:
+def logarithm(input_data: LogarithmInput) -> LogarithmOutput:
     """
     Calculate logarithms for use in AI agents.
 
@@ -758,26 +861,39 @@ def logarithm(number: float, base: float = math.e) -> str:
         base (float): Base of logarithm (default: e for natural log)
 
     Returns:
-        str: Formatted result with calculation details
+        LogarithmOutput: Structured output with calculation result and metadata
 
     Examples:
-        logarithm(100, 10) -> "log₁₀(100) = 2.0"
-        logarithm(2.718) -> "ln(2.718) = 0.999896"
+        logarithm(100, 10) -> LogarithmOutput with result 2.0
+        logarithm(2.718) -> LogarithmOutput with result 0.999896
     """
     try:
-        input_data = LogarithmInput(number=number, base=base)
         result = _calculator_instance.logarithm_operation(input_data)
 
         if result.success:
-            return f"{result.expression} = {result.formatted_result}"
+            return result
         else:
-            return f"Error: {result.error_message}"
+            return LogarithmOutput(
+                result=0,
+                expression=f"log({input_data.number})",
+                number=input_data.number,
+                base=input_data.base,
+                success=False,
+                error_message=result.error_message,
+            )
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return LogarithmOutput(
+            result=0,
+            expression=f"log({input_data.number})",
+            number=input_data.number,
+            base=input_data.base,
+            success=False,
+            error_message=str(e),
+        )
 
 
-def calculator_memory(operation: str, value: Optional[float] = None) -> str:
+def calculator_memory(input_data: MemoryOperation) -> MemoryOutput:
     """
     Perform memory operations for calculator in AI agents.
 
@@ -786,32 +902,66 @@ def calculator_memory(operation: str, value: Optional[float] = None) -> str:
         value (Optional[float]): Value for store/add/subtract operations
 
     Returns:
-        str: Formatted result with memory operation details
+        MemoryOutput: Structured output with memory operation details
 
     Examples:
-        calculator_memory("store", 42) -> "Memory stored: 42"
-        calculator_memory("recall") -> "Memory recalled: 42"
-        calculator_memory("add", 8) -> "Memory + 8 = 50"
+        calculator_memory("store", 42) -> MemoryOutput with stored value
+        calculator_memory("recall") -> MemoryOutput with recalled value
+        calculator_memory("add", 8) -> MemoryOutput with updated memory
     """
     try:
-        input_data = MemoryOperation(operation=operation, value=value)
         result = _calculator_instance.memory_operation(input_data)
-
-        if result["success"]:
-            if operation == "recall":
-                return f"Memory recalled: {result['memory_value']}"
-            elif operation == "clear":
-                return "Memory cleared"
-            elif operation == "store":
-                return f"Memory stored: {value}"
-            elif operation == "add":
-                return f"Memory + {value} = {result['memory_value']}"
-            elif operation == "subtract":
-                return f"Memory - {value} = {result['memory_value']}"
-            else:
-                return f"Memory operation completed: {result['memory_value']}"
-        else:
-            return f"Error: {result['error_message']}"
+        return result
 
     except Exception as e:
-        return f"Error: {str(e)}"
+        return MemoryOutput(
+            operation=input_data.operation,
+            memory_value=0,
+            error_message=str(e),
+            success=False,
+        )
+
+
+def get_calculation_history() -> HistoryOutput:
+    """
+    Get calculation history for use in AI agents.
+
+    Returns:
+        HistoryOutput: Structured output with calculation history
+
+    Examples:
+        get_calculation_history() -> HistoryOutput with history list and count
+    """
+    try:
+        return _calculator_instance.get_history_output()
+    except Exception as e:
+        return HistoryOutput(
+            history=[],
+            count=0,
+            success=False,
+        )
+
+
+def clear_calculation_history() -> HistoryOutput:
+    """
+    Clear calculation history for use in AI agents.
+
+    Returns:
+        HistoryOutput: Structured output confirming history cleared
+
+    Examples:
+        clear_calculation_history() -> HistoryOutput with empty history
+    """
+    try:
+        _calculator_instance.clear_history()
+        return HistoryOutput(
+            history=[],
+            count=0,
+            success=True,
+        )
+    except Exception as e:
+        return HistoryOutput(
+            history=[],
+            count=0,
+            success=False,
+        )
