@@ -1,6 +1,6 @@
 # summerschool_workshop
 
-A private Python-based project for experimenting with advanced data retrieval and conversational AI workflows. The repository focuses on integrating semantic search, vector databases, memory caching, and large language models (LLMs) for question-answering and agent-driven interaction.
+A Python-based project for experimenting with advanced data retrieval and conversational AI workflows. The repository focuses on integrating semantic search, vector databases, memory caching, and large language models (LLMs) for question-answering and agent-driven interaction.
 
 ## Features
 
@@ -21,28 +21,71 @@ A private Python-based project for experimenting with advanced data retrieval an
 
 ## Setup
 
-1. **Clone the repository**  
-   ```
+### 🐳 Docker Setup (Recommended)
+
+The easiest way to run this project on any device is using Docker:
+
+1. **Clone the repository**
+   ```bash
    git clone https://github.com/waanney/summerschool_workshop.git
    cd summerschool_workshop
    ```
 
-2. **Install dependencies**  
-   Recommended to use a virtual environment.
-   ```
-   pip install .  
+2. **Set up environment variables**
+   ```bash
+   make setup
+   # Edit .env file with your API keys
    ```
 
-3. **Environment Variables**  
-   Set the following environment variables as needed:
+3. **Start all services**
+   ```bash
+   make build
+   ```
+
+4. **Access the application**
+   - **Chainlit Interface**: http://localhost:8000
+   - **Milvus**: http://localhost:19530
+   - **MinIO Console**: http://localhost:9001
+
+5. **Run the chatbot**
+   ```
+   make run-chatbot
+   ```
+For detailed Docker setup instructions, see [DOCKER_SETUP.md](DOCKER_SETUP.md).
+
+### 🐍 Local Python Setup
+
+If you prefer to run without Docker:
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/waanney/summerschool_workshop.git
+   cd summerschool_workshop
+   ```
+
+2. **Install dependencies**
+   Recommended to use a virtual environment with UV:
+   ```bash
+   pip install uv
+   uv sync
+   ```
+
+3. **Environment Variables**
+   Create a `.env` file with:
    - `GEMINI_API_KEY` (for Google Gemini)
    - `MILVUS_URI`, `MILVUS_TOKEN` (for Milvus vector DB)
    - Redis connection details (if not default)
 
-4. **Run a Demo**  
-   To start the conversational demo (requires Chainlit):
+4. **Start external services**
+   You'll need to run Redis and Milvus separately, or use:
+   ```bash
+   make up-deps  # Start only data services
    ```
-   chainlit run workflow/demo_with_memory.py
+
+5. **Run a Demo**
+   To start the conversational demo:
+   ```bash
+   uv run chainlit run workflow/SAMPLE.py
    ```
 
 ## Project Structure

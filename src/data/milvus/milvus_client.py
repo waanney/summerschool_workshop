@@ -209,7 +209,7 @@ class MilvusClient:
 
         try:
             # Load collection into memory
-            self.collection.load()
+            self.collection.load(replica_number=1)
             print("Collection loaded successfully")
         except Exception as e:
             print(f"Error loading collection: {str(e)}")
@@ -312,14 +312,14 @@ class MilvusClient:
                 return []
 
     def generic_hybrid_search(
-            self,
-            query_text: str,
-            query_dense_embedding: List[float],
-            limit: int = 10,
-            fields_to_search: Optional[List[str]] = None,
-            dense_weight: float = 0.7,
-            sparse_weight: float = 0.3,
-            output_fields: Optional[List[str]] = None,
+        self,
+        query_text: str,
+        query_dense_embedding: List[float],
+        limit: int = 10,
+        fields_to_search: Optional[List[str]] = None,
+        dense_weight: float = 0.7,
+        sparse_weight: float = 0.3,
+        output_fields: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         """
         Performs a generic, multi-field hybrid search on the collection.
@@ -343,14 +343,16 @@ class MilvusClient:
         """
         self._ensure_connection()
         try:
-            self.collection.load()
+            self.collection.load(replica_number=1)
         except Exception as e:
             print(f"Error loading collection: {e}")
             return []
 
         # --- 1. Discover Fields if Not Provided ---
         if not fields_to_search:
-            print("`fields_to_search` not provided. Auto-discovering searchable fields...")
+            print(
+                "`fields_to_search` not provided. Auto-discovering searchable fields..."
+            )
             fields_to_search = []
             all_field_names = {f.name for f in self.collection.schema.fields}
 
@@ -361,12 +363,16 @@ class MilvusClient:
                     field_name = field_schema.name
                     dense_field = f"{field_name}_dense_embedding"
                     sparse_field = f"{field_name}_sparse_embedding"
-                    if dense_field in all_field_names and sparse_field in all_field_names:
+                    if (
+                        dense_field in all_field_names
+                        and sparse_field in all_field_names
+                    ):
                         fields_to_search.append(field_name)
 
             if not fields_to_search:
                 raise ValueError(
-                    "Could not auto-discover any valid text fields for hybrid search. Ensure fields follow the `_dense_embedding` and `_sparse_embedding` naming convention.")
+                    "Could not auto-discover any valid text fields for hybrid search. Ensure fields follow the `_dense_embedding` and `_sparse_embedding` naming convention."
+                )
             print(f"Auto-discovered fields: {fields_to_search}")
 
         # --- 2. Prepare Search Requests and Weights ---
@@ -377,27 +383,34 @@ class MilvusClient:
 
         for field in fields_to_search:
             # Dense request
-            search_requests.append(AnnSearchRequest(
-                data=[query_dense_embedding],
-                anns_field=f"{field}_dense_embedding",
-                param=dense_params,
-                limit=limit * 2,
-            ))
+            search_requests.append(
+                AnnSearchRequest(
+                    data=[query_dense_embedding],
+                    anns_field=f"{field}_dense_embedding",
+                    param=dense_params,
+                    limit=limit * 2,
+                )
+            )
             ranker_weights.append(dense_weight)
 
             # Sparse request
-            search_requests.append(AnnSearchRequest(
-                data=[query_text],  # Use raw text for BM25
-                anns_field=f"{field}_sparse_embedding",
-                param=sparse_params,
-                limit=limit * 2,
-            ))
+            search_requests.append(
+                AnnSearchRequest(
+                    data=[query_text],  # Use raw text for BM25
+                    anns_field=f"{field}_sparse_embedding",
+                    param=sparse_params,
+                    limit=limit * 2,
+                )
+            )
             ranker_weights.append(sparse_weight)
 
         # --- 3. Determine Output Fields ---
         if not output_fields:
-            output_fields = [f.name for f in self.collection.schema.fields if
-                             f.dtype not in [DataType.FLOAT_VECTOR, DataType.SPARSE_FLOAT_VECTOR]]
+            output_fields = [
+                f.name
+                for f in self.collection.schema.fields
+                if f.dtype not in [DataType.FLOAT_VECTOR, DataType.SPARSE_FLOAT_VECTOR]
+            ]
 
         # --- 4. Execute Search ---
         try:
@@ -411,19 +424,21 @@ class MilvusClient:
             )
 
             formatted_results = []
-            if results:
-                for hit in results[0]:  # Results are in the first element
-                    entity_data = {"score": hit.score}
-                    for field in output_fields:
-                        entity_data[field] = hit.entity.get(field)
-                    formatted_results.append(entity_data)
+
+            for hit in results[0]:  # type: ignore
+                entity_data = {"score": hit.score}
+                for field in output_fields:
+                    entity_data[field] = hit.entity.get(field)
+                formatted_results.append(entity_data)
             return formatted_results
 
         except Exception as e:
             print(f"Generic hybrid search failed: {e}")
             traceback.print_exc()
             # Fallback to simple dense search on the first field
-            print(f"Falling back to simple dense search on field '{fields_to_search[0]}'.")
+            print(
+                f"Falling back to simple dense search on field '{fields_to_search[0]}'."
+            )
             try:
                 first_dense_field = f"{fields_to_search[0]}_dense_embedding"
                 fallback_results = self.collection.search(
@@ -435,7 +450,7 @@ class MilvusClient:
                 )
                 formatted_results = []
                 if fallback_results:
-                    for hit in fallback_results[0]:
+                    for hit in fallback_results[0]:  # type: ignore
                         entity_data = {"score": hit.score}
                         for field in output_fields:
                             entity_data[field] = hit.entity.get(field)
