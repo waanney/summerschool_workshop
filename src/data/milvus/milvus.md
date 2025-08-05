@@ -1,4 +1,4 @@
-# 📂 Folder: milvus
+#  Folder: milvus
 
 This folder contains the logic for **Milvus vector database integration**, handling:
 
@@ -14,9 +14,9 @@ It includes two main files:
 
 ---
 
-## 📄 File: `indexing.py`
+##  File: `indexing.py`
 
-### ✅ Purpose
+###  Purpose
 
 * Dynamically loads FAQ data (CSV/XLSX)
 * Creates Milvus collections with **dynamic fields**
@@ -25,7 +25,7 @@ It includes two main files:
 
 ---
 
-## 📌 `class MilvusIndexer`
+##  `class MilvusIndexer`
 
 Handles **data ingestion & indexing** into Milvus.
 
@@ -88,9 +88,9 @@ Handles **data ingestion & indexing** into Milvus.
 
 ---
 
-## 📄 File: `milvus_client.py`
+##  File: `milvus_client.py`
 
-### ✅ Purpose
+###  Purpose
 
 * Provides a **generic client** for Milvus operations.
 * Ensures connection & collection existence.
@@ -98,7 +98,7 @@ Handles **data ingestion & indexing** into Milvus.
 
 ---
 
-## 📌 `class MilvusClient`
+##  `class MilvusClient`
 
 Handles **connection**, **collection management**, and **search queries**.
 
@@ -160,7 +160,7 @@ Handles **connection**, **collection management**, and **search queries**.
 
 ---
 
-## 🔄 Typical Flow
+##  Typical Flow
 
 1. **Data Indexing** (dynamic)
 

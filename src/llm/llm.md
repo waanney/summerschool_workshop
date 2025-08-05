@@ -1,5 +1,5 @@
 
-# 📂 Folder: llm
+# Folder: llm
 
 This folder contains **LLM (Large Language Model) client integrations and utilities**, focusing on model setup, agent creation, and tool integration.
 
@@ -9,9 +9,9 @@ It currently includes:
 
 ---
 
-## 📄 File: `base.py`
+## File: `base.py`
 
-### ✅ Purpose
+###  Purpose
 
 * Provides a **base client for LLM agents** using the `pydantic_ai` framework.
 * Integrates with **Google Gemini API** via `GoogleGLAProvider`.
@@ -20,7 +20,7 @@ It currently includes:
 
 ---
 
-## 📌 `class AgentClient`
+##  `class AgentClient`
 
 A simple wrapper to configure and create a `pydantic_ai.Agent` instance.
 
@@ -53,7 +53,7 @@ A simple wrapper to configure and create a `pydantic_ai.Agent` instance.
 
 ---
 
-## ✅ Additional Components
+##  Additional Components
 
 * **`provider`** → Uses `GoogleGLAProvider` with API key from environment (`GEMINI_API_KEY`).
 * **`model`** → Preconfigured `GeminiModel` (`gemini-2.0-flash`).
@@ -61,7 +61,7 @@ A simple wrapper to configure and create a `pydantic_ai.Agent` instance.
 
 ---
 
-## ✅ Usage Example
+##  Usage Example
 
 ```python
 from llm.base import AgentClient
