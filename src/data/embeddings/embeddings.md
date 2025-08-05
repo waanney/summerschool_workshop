@@ -1,4 +1,4 @@
-# 📂 Folder: embeddings
+#  Folder: embeddings
 
 This folder provides functionality for **text embedding generation and management** using pre-trained **Sentence-Transformers** models. It supports:
 
@@ -8,9 +8,9 @@ This folder provides functionality for **text embedding generation and managemen
 
 ---
 
-## 📄 File: `embedding_engine.py`
+##  File: `embedding_engine.py`
 
-### ✅ Purpose
+###  Purpose
 
 This module wraps **Sentence-Transformers** models to generate embeddings for text. It allows you to:
 
@@ -21,7 +21,7 @@ This module wraps **Sentence-Transformers** models to generate embeddings for te
 
 ---
 
-## 📌 Enumerations
+##  Enumerations
 
 ### `EmbeddingModel`
 
@@ -41,7 +41,7 @@ Defines status labels for embedding operations:
 
 ---
 
-## 📌 `class EmbeddingEngine`
+##  `class EmbeddingEngine`
 
 The main class that manages embedding generation using **Sentence-Transformers**.
 
@@ -144,7 +144,7 @@ The main class that manages embedding generation using **Sentence-Transformers**
 
 ---
 
-## 🔄 Typical Usage Flow
+##  Typical Usage Flow
 
 1. **Initialize the engine**
 

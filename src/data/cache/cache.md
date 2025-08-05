@@ -1,17 +1,17 @@
 
-# 📂 Folder: cache
+# Folder: cache
 
 This folder provides a **short-term conversation memory** mechanism for the chatbot.  
 Its main purpose is to **retain recent conversation history** so the bot can respond with proper context.
 
-## 📄 File: `memory_handler.py`
+## File: `memory_handler.py`
 
-### ✅ Purpose
+### Purpose
 - Handles **short-term memory** for user conversations.
 - Provides a simple API to **retrieve history**, **store bot responses**, and **log errors**.
 - Separates memory logic from the main codebase for better readability and maintainability.
 
-### 📌 `class MessageMemoryHandler`
+### `class MessageMemoryHandler`
 
 Acts as a **wrapper** around `ShortTermMemory` (from `redis_cache.py`) to simplify usage.
 
@@ -48,14 +48,14 @@ Acts as a **wrapper** around `ShortTermMemory` (from `redis_cache.py`) to simpli
 
 ---
 
-## 📄 File: `redis_cache.py`
+##  File: `redis_cache.py`
 
-### ✅ Purpose
+###  Purpose
 - Provides a **Redis-backed storage** for short-term conversation memory.
 - Manages user sessions and enforces a **maximum message retention** policy.
 - Supports retrieving and formatting history for contextual responses.
 
-### 📌 `class ShortTermMemory`
+###  `class ShortTermMemory`
 
 Manages **session keys**, and handles storing, retrieving, and trimming messages in Redis.
 

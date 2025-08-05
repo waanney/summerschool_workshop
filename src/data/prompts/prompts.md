@@ -1,5 +1,5 @@
 
-# 📂 Folder: prompts
+#  Folder: prompts
 
 This folder contains **prompt templates and scripts** used for configuring and testing LLM-based agents.
 
@@ -11,7 +11,7 @@ It currently includes the following files:
 
 ---
 
-## ✅ Purpose of the folder
+##  Purpose of the folder
 
 * Centralizes **prompt engineering** components.
 * Provides **reusable prompt templates** for different agent behaviors.
@@ -19,7 +19,7 @@ It currently includes the following files:
 
 ---
 
-## ✅ Typical usage
+##  Typical usage
 
 * Other modules (like Milvus indexing, embedding engine, or chatbot pipelines) may **import prompt templates** from this folder.
 * `demo.py` might be used for quick local testing:

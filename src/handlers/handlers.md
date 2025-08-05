@@ -1,5 +1,5 @@
 
-# 📂 Folder: handlers
+# Folder: handlers
 
 This folder contains **utility classes for handling runtime events** like errors, logging, or other operational concerns.
 
@@ -9,9 +9,9 @@ It currently includes:
 
 ---
 
-## 📄 File: `error_handler.py`
+##  File: `error_handler.py`
 
-### ✅ Purpose
+###  Purpose
 
 * Provides a **centralized exception handling mechanism**.
 * Logs errors consistently using a shared logger.
@@ -19,7 +19,7 @@ It currently includes:
 
 ---
 
-## 📌 `class ErrorHandler`
+##  `class ErrorHandler`
 
 A simple class for handling and logging exceptions.
 
@@ -58,7 +58,7 @@ A simple class for handling and logging exceptions.
 
 ---
 
-## ✅ Usage Example
+##  Usage Example
 
 ```python
 try:
