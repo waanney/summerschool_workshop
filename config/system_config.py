@@ -1,8 +1,8 @@
 """
 System configuration management module.
 
-This module provides centralized configuration management for the summerschool
-workshop project. It handles environment variables, application settings,
+This module provides centralized configuration management for the codebase.
+It handles environment variables, application settings,
 and provides type-safe access to configuration values.
 """
 
@@ -33,7 +33,7 @@ class Environment(str, Enum):
 
 class Settings:
     """
-    Settings for the summerschool workshop service.
+    Settings for the CodeBase.
     
     This class manages all configuration settings for the application,
     including environment variables, API settings, database connections,
@@ -73,7 +73,7 @@ class Settings:
         load_dotenv(env_file)
         
         # Application settings
-        self.APP_NAME: str = "Summerschool Workshop API"
+        self.APP_NAME: str = "CodeBase"
         self.DEBUG: bool = self._get_bool_env("DEBUG", True)
         self.API_VERSION: str = "v1"
         self.HOST: str = os.getenv("API_HOST", "127.0.0.1")

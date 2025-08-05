@@ -1,7 +1,7 @@
 """
-Summerschool Workshop Source Package.
+CodeBase Source Package.
 
-This is the main source package for the summerschool workshop project.
+This is the main source package for the CodeBase.
 It contains all the core modules and functionality for the workshop
 including data management, utilities, LLM integration, and more.
 
@@ -35,5 +35,5 @@ from . import prompt_engineering
 from . import mcp_tools
 
 __version__ = "1.0.0"
-__author__ = "Summerschool Workshop Team"
-__description__ = "Main source package for the summerschool workshop project"
+__author__ = "Anonymous"
+__description__ = "Main source package for the CodeBase"

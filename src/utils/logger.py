@@ -1,8 +1,8 @@
 """
 Logging configuration and utilities module.
 
-This module provides centralized logging configuration for the summerschool
-workshop project. It supports both file and console logging with configurable
+This module provides centralized logging configuration for the CodeBase.
+It supports both file and console logging with configurable
 log levels and formatters.
 """
 

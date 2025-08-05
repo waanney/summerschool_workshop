@@ -1,5 +1,5 @@
 """
-Base tools and utilities package for the summerschool workshop.
+Base tools and utilities package for the CodeBase.
 
 This package provides a comprehensive collection of utility tools and functions
 for various common tasks including:
@@ -151,5 +151,5 @@ from .calculator_tool import (
 
 # Version information
 __version__ = "1.0.0"
-__author__ = "Summerschool Workshop Team"
-__description__ = "Base tools and utilities for the summerschool workshop project"
+__author__ = "Anonymous"
+__description__ = "Base tools and utilities for the CodeBase"
