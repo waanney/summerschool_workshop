@@ -19,5 +19,5 @@ from .embedding_engine import (
 )
 
 __version__ = "1.0.0"
-__author__ = "Summerschool Workshop Team"
+__author__ = "Anonymous"
 __description__ = "Text embedding generation and management package"

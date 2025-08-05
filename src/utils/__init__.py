@@ -1,7 +1,7 @@
 """
-Utilities package for the summerschool workshop project.
+Utilities package for the CodeBase.
 
-This package provides utility modules and tools for the summerschool workshop
+This package provides utility modules and tools for the CodeBase
 project, including base tools, logging utilities, and other helper functions.
 
 Modules:
@@ -16,5 +16,5 @@ from . import basetools
 from . import logger
 
 __version__ = "1.0.0"
-__author__ = "Summerschool Workshop Team"
-__description__ = "Utilities package for the summerschool workshop project"
+__author__ = "Anonymous"
+__description__ = "Utilities package for the CodeBase"

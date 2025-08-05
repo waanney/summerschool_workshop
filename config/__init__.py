@@ -1,8 +1,8 @@
 """
-Configuration management package for the summerschool workshop.
+Configuration management package for the CodeBase.
 
-This package provides configuration management for the summerschool workshop
-project, including system settings, model configurations, logging setup,
+This package provides configuration management for the CodeBase,
+including system settings, model configurations, logging setup,
 and prompt templates.
 
 Modules:
@@ -18,5 +18,5 @@ validation, type safety, and comprehensive documentation.
 from . import system_config
 
 __version__ = "1.0.0"
-__author__ = "Summerschool Workshop Team"
-__description__ = "Configuration management package for the summerschool workshop project"
+__author__ = "Anonymous"
+__description__ = "Configuration management package for the CodeBase"

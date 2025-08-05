@@ -1,5 +1,5 @@
 """
-Data management and processing package for the summerschool workshop.
+Data management and processing package for the CodeBase.
 
 This package provides modules for handling various types of data operations
 including embeddings, vector storage, caching, and prompt management.
@@ -22,7 +22,7 @@ from . import prompts
 from . import mock_data
 
 __version__ = "1.0.0"
-__author__ = "Summerschool Workshop Team"
+__author__ = "Anonymous"
 __description__ = (
-    "Data management and processing package for the summerschool workshop project"
+    "Data management and processing package for the CodeBase"
 )
