@@ -1,12 +1,12 @@
 # AI Agent for High School Students - Summer School Workshop
 
-## 📖 Overview
+## Overview
 
 This project is an AI Agent system designed for high school students, utilizing modern AI technologies to create an intelligent chatbot that can answer admission questions and support students.
 
-> 📄 **Official Reference Materials**: [EAAI AI Agent for High School Students Materials Official 2025](./EAAI_AI_Agent_for_High_School_Students_Materials_Official_2025.pdf)
+> **Official Reference Materials**: [EAAI AI Agent for High School Students Materials Official 2025](./EAAI_AI_Agent_for_High_School_Students_Materials_Official_2025.pdf)
 
-## ✨ Key Features
+## Key Features
 
 - **AI Chatbot**: Intelligent chatbot powered by Gemini AI model
 - **FAQ System**: Frequently Asked Questions system with vector search
@@ -15,7 +15,7 @@ This project is an AI Agent system designed for high school students, utilizing 
 - **Vector Database**: Using Milvus for storing and searching vector embeddings
 - **Web Interface**: Web interface built with Chainlit
 
-## 🚀 Installation and Setup
+## Installation and Setup
 
 > 📖 **Handbook Reference**: Section 2.1 - Environment Setup
 
@@ -77,7 +77,7 @@ MILVUS_TOKEN=
 Start Milvus and Redis services locally or use cloud services.
 Read more details in hands-on book.
 
-## 💡 Building Your AI Agent - From Idea to Implementation
+## Building Your AI Agent - From Idea to Implementation
 
 > 📖 **Handbook Reference**: Chapter 8 - Agent Development Lifecycle
 
