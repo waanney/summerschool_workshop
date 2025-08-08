@@ -17,7 +17,7 @@ This project is an AI Agent system designed for high school students, utilizing 
 
 ## Installation and Setup
 
-> 📖 **Handbook Reference**: Section 2.1 - Environment Setup
+> 📖 **Handbook Reference**: Section 2 - Environment Setup
 
 ### System Requirements
 
@@ -35,9 +35,6 @@ cd summerschool_workshop
 ```
 
 ### 2. Install dependencies
-
-> 📖 **Handbook Reference**: Section 2.3 - Dependency Management
-
 #### Using UV (Recommended):
 ```bash
 # Install UV
@@ -54,7 +51,7 @@ pip install -e .
 
 ### 3. Environment Configuration
 
-> 📖 **Handbook Reference**: Section 2.4 - API Keys and Environment Variables
+> 📖 **Handbook Reference**: Section 2.5 - The .env File
 
 Create `.env` file from template:
 
@@ -72,19 +69,13 @@ MILVUS_TOKEN=
 
 ### 4. Database Setup
 
-> 📖 **Handbook Reference**: Section 3.1 - Vector Database Configuration
+> 📖 **Handbook Reference**: Section 2.3 - Redis-server and Section 5.3 - Database setup with Milvus
 
 Start Milvus and Redis services locally or use cloud services.
 Read more details in hands-on book.
 
 ## Building Your AI Agent - From Idea to Implementation
-
-> 📖 **Handbook Reference**: Chapter 8 - Agent Development Lifecycle
-
 ### Step 1: Conceptualize Your Agent
-
-> 📖 **Handbook Reference**: Section 8.1 - Ideation and Planning
-
 Before writing any code, clearly define:
 
 **1. Agent's Purpose**
@@ -111,9 +102,6 @@ Base on your agent and create some data like this:
 - External APIs (university websites)
 
 ### Step 2: Data Collection and Preparation
-
-> 📖 **Handbook Reference**: Section 8.2 - Data Strategy
-
 **1. Gather Your Data**  
 Find data on Google or reputable websites.
 
@@ -155,7 +143,7 @@ Save your data in `src/data/mock_data`, for example:
 
 ### Step 3: Database Design and Setup
 
-> 📖 **Handbook Reference**: Section 8.3 - Vector Database Strategy
+> 📖 **Handbook Reference**: Section 4 - Dataset Construction and Section 6.2 (Step 1 and 2) - Practical Implementation
 
 **1. Plan Your Collections**
 For our university admission agent:
@@ -196,7 +184,7 @@ def setup_database():
 
 ### Step 4: Tool Development
 
-> 📖 **Handbook Reference**: Section 8.4 - Building Custom Tools
+> 📖 **Handbook Reference**: Section 5.4.2 - Create Tools and Section 6.2 (Step 4.4 and Step 4.5)
 
 **1. Analyze Existing MCP Tools**
 Study available tools in `src/utils/basetools/`:
@@ -207,9 +195,6 @@ Study available tools in `src/utils/basetools/`:
 - `calculator_tool.py` - Mathematical calculations
 
 **2. Design Your Custom Tools**
-
-> 📖 **Handbook Reference**: Section 8.4.2 - Tool Development Patterns
-
 **All custom tools go in `src/utils/basetools/`** following existing patterns.
 
 **Example: Course Search Tool**
@@ -310,7 +295,7 @@ src/utils/basetools/your_tool_name.py
 
 ### Step 5: Agent Workflow Integration
 
-> 📖 **Handbook Reference**: Section 8.5 - Workflow Orchestration
+> 📖 **Handbook Reference**: Section 5.4.4 - Multi Agent System and Section 6.2 (Step 4.6 and 4.7 and step 5)
 
 **1. Create Your Agent File**
 Create a new workflow file like `workflow/university_agent.py`:
@@ -408,7 +393,7 @@ uv run chainlit run workflow/university_agent.py -w
 
 ## Project Structure
 
-> 📖 **Handbook Reference**: Section 1.3 - Architecture Overview
+> 📖 **Handbook Reference**: Section 6.1 - Folder Structure Overview
 
 ```
 summerschool_workshop/
@@ -428,58 +413,7 @@ summerschool_workshop/
 ├── logs/                      # Log files
 └── pyproject.toml            # Project dependencies
 ```
-
-## Configuration and Customization
-
-### AI Model Configuration
-
-> 📖 **Handbook Reference**: Section 4.2 - LLM Integration
-
-Edit in `workflow/main.py`:
-
-```python
-# Change model
-provider = GoogleGLAProvider(api_key=os.getenv("GEMINI_API_KEY"))
-model = GeminiModel('gemini-2.0-flash', provider=provider)
-```
-
-### Tools Configuration
-
-> 📖 **Handbook Reference**: Section 4.3 - Tool Integration
-
-Add or modify tools in `workflow/main.py`:
-
-```python
-# FAQ Tool
-faq_tool = create_faq_tool(collection_name="your_collection")
-
-# Email Tool
-email_tool = send_email_tool
-
-# Add to agent
-agent = AgentClient(
-    model=model,
-    system_prompt=SYSTEM_PROMPT,
-    tools=[faq_tool, email_tool],
-    memory_handler=memory_handler
-)
-```
-
-### Custom System Prompt
-
-> 📖 **Handbook Reference**: Section 4.4 - Prompt Engineering
-
-Edit in `src/data/prompts/your_agent_prompt.py`:
-
-```python
-SYSTEM_PROMPT = """
-Your custom system prompt here...
-"""
-```
-
 ## Documentation References
-
-> 📖 **Handbook Reference**: Section 6 - Additional Resources
 
 - **Official Paper**: See attached PDF file in repository
 - **Milvus Documentation**: https://milvus.io/docs
