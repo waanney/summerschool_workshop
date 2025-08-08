@@ -15,8 +15,8 @@ from data.cache.memory_handler import MessageMemoryHandler
 # Initialize Milvus indexer (run only once to create collection and index data)
 # Comment this out after first run
 # Replace "___________" with your collection name and FAQ file path
-#indexer = MilvusIndexer(collection_name="company1", faq_file="src/data/mock_data/HR_FAQ.xlsx")
-#indexer.run()
+indexer = MilvusIndexer(collection_name="company1", faq_file="src/data/mock_data/HR_FAQ.xlsx")
+indexer.run()
 # Initialize model and provider
 provider = GoogleGLAProvider(api_key=os.getenv("GEMINI_API_KEY"))
 model = GeminiModel('gemini-2.0-flash', provider=provider)
