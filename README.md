@@ -420,3 +420,49 @@ summerschool_workshop/
 - **Chainlit Documentation**: https://docs.chainlit.io
 - **Pydantic AI Documentation**: https://ai.pydantic.dev
 - **Gemini AI Documentation**: https://ai.google.dev
+
+
+
+## In Addition
+
+We've pre-packaged a basic setup that allows you to get started quickly using Docker.
+
+### Quick Start with Docker
+
+If you want to skip the manual setup process and get the AI Agent running immediately, you can use our pre-configured Docker environment:
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/waanney/summerschool_workshop.git
+   cd summerschool_workshop
+   ```
+
+2. **Set up environment variables**
+   ```bash
+   make setup
+   # Edit .env file with your API keys
+   ```
+
+3. **Start all services**
+   ```bash
+   make build
+   ```
+
+4. **Access the application**
+   - **Chainlit Interface**: http://localhost:8000
+   - **MinIO Console**: http://localhost:9001
+
+5. **Run the chatbot**
+   ```
+   make run-chatbot
+   ```
+
+This Docker setup includes:
+- **Milvus vector database** with pre-configured collections
+- **Redis cache** for memory management
+- **Web application** with Chainlit interface
+- **Sample data** already indexed and ready to use
+
+Perfect for workshops, demos, or quick prototyping!
+
+> 💡 **Note**: The Docker setup is ideal for getting started quickly, but for production use or extensive customization, we recommend following the manual installation steps above.
