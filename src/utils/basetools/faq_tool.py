@@ -55,7 +55,7 @@ embedding_engine: EmbeddingEngine = EmbeddingEngine()
 
 
 def faq_tool(
-    input: SearchInput, collection_name: str = "summerschool_workshop"
+    input: SearchInput, collection_name: str = "database"
 ) -> SearchOutput:
     """
     Search FAQ entries using semantic similarity.
@@ -102,7 +102,7 @@ def faq_tool(
     )
 
 
-def create_faq_tool(collection_name: str = "summerschool_workshop") -> callable:
+def create_faq_tool(collection_name: str = "database") -> callable:
     """
     Create a FAQ tool function with a pre-configured collection name.
 

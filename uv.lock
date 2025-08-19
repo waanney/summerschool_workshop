@@ -3950,7 +3950,7 @@ wheels = [
 ]
 
 [[package]]
-name = "summerschool-workshop"
+name = "repo"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

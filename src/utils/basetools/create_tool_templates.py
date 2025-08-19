@@ -52,7 +52,7 @@ typing, and documentation standards for tool development.
 #     user_query: str = Field(..., description="The user's query to search for relevant documents")
 #     k: int = Field(3, description="The maximum number of documents to return")
 #     threshold: float = Field(0.7, description="The minimum similarity score for a document to be considered relevant")
-#     collection_name: str = Field("summerschool_workshop", description="The name of the Milvus collection to search in")
+#     collection_name: str = Field("database", description="The name of the Milvus collection to search in")
 #     search_mode: SearchMode = Field(SearchMode.SEMANTIC, description="Search mode to use")
 
 
@@ -166,7 +166,7 @@ typing, and documentation standards for tool development.
 # 8. Create factory function (optional)
 # **********************
 
-# def create_search_tool(collection_name: str = "summerschool_workshop") -> callable:
+# def create_search_tool(collection_name: str = "database") -> callable:
 #     """
 #     Create a search tool function with a pre-configured collection name.
 #

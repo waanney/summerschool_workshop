@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class MilvusIndexer:
     def __init__(
         self,
-        collection_name="summerschool_workshop",
+        collection_name="database",
         faq_file="src/data/mock_data/admission_faq_large.csv",
     ):
         self.collection_name = collection_name
@@ -272,7 +272,7 @@ class MilvusIndexer:
 
 if __name__ == "__main__":
     indexer = MilvusIndexer(
-        collection_name="summerschool_workshop",
+        collection_name="database",
         faq_file="src/data/mock_data/HR_FAQ_full.xlsx",
     )
     indexer.run()

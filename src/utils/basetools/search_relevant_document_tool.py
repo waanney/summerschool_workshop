@@ -37,7 +37,7 @@ class SearchRelevantDocumentInput(BaseModel):
         description="The minimum similarity score for a document to be considered relevant",
     )
     collection_name: str = Field(
-        "summerschool_workshop",
+        "database",
         description="The name of the Milvus collection to search in",
     )
 
