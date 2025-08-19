@@ -433,8 +433,8 @@ If you want to skip the manual setup process and get the AI Agent running immedi
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/waanney/summerschool_workshop.git
-   cd summerschool_workshop
+   git clone https://github.com/user/repo.git
+   cd repo
    ```
 
 2. **Set up environment variables**
