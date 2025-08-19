@@ -396,7 +396,7 @@ uv run chainlit run workflow/university_agent.py -w
 > 📖 **Handbook Reference**: Section 6.1 - Folder Structure Overview
 
 ```
-summerschool_workshop/
+codebase/
 ├── src/
 │   ├── data/
 │   │   ├── cache/              # Redis cache and memory handling
