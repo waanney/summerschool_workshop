@@ -1,4 +1,4 @@
-# AI Agent for High School Students - Summer School Workshop
+# A Hackathon-Based Framework for Introducing High School Students to AI Agents
 
 ## Overview
 
@@ -30,8 +30,8 @@ This project is an AI Agent system designed for high school students, utilizing 
 > 📖 **Handbook Reference**: Section 2.2 - Getting Started
 
 ```bash
-git clone https://github.com/user/summerschool_workshop.git
-cd summerschool_workshop
+git clone https://github.com/user/repo.git
+cd repo
 ```
 
 ### 2. Install dependencies
